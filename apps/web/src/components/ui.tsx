@@ -24,8 +24,6 @@ export function MaterialPanel({
   const Heading = headingLevel === 1 ? "h1" : "h2";
   return (
     <Element className={classNames("material-panel", className)}>
-      <span className="panel-bolt panel-bolt-a" aria-hidden="true" />
-      <span className="panel-bolt panel-bolt-b" aria-hidden="true" />
       {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
       {title ? <Heading>{title}</Heading> : null}
       {children}

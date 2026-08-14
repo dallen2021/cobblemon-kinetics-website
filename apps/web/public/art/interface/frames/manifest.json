@@ -1,0 +1,74 @@
+{
+  "manifest_version": 1,
+  "generated_at": "2026-08-14",
+  "provider": "openai_builtin_imagegen",
+  "source_kind": "project_generated_interface_art",
+  "rights_status": "approved_interface_only",
+  "usage_boundary": "interface_only",
+  "third_party_visual_references": [],
+  "project_visual_reference": {
+    "kind": "maintainer-approved generated Workshop Ledger mockup",
+    "sha256": "85b4a3925b7cac90e6e406b245f5c7d617c073507fcf75091717b06e87e8c58b",
+    "width": 1487,
+    "height": 1058,
+    "redistributed": false,
+    "usage": "style_and_material_guidance_only"
+  },
+  "method": {
+    "generation": "Built-in ImageGen with the project visual reference supplied through referenced_image_paths",
+    "downsample": "sips downsampled each chroma source to its exact public output dimensions",
+    "alpha": "remove_chroma_key.py removed explicit #FF00FF with soft matte thresholds 20/150 and despill",
+    "output": "lossless sRGB RGBA PNG with a transparent center and no baked content or cast shadow"
+  },
+  "prohibited_subjects": [
+    "pokemon",
+    "creatures",
+    "workers",
+    "machines",
+    "machine_parts",
+    "items",
+    "registry_objects",
+    "gameplay_scenes"
+  ],
+  "files": [
+    {
+      "path": "panel-frame-brass.png",
+      "sha256": "ab454945ad8d4f0f800414955dfef38cd42924d1ae1316e2d35a7a4c58d8963c",
+      "width": 256,
+      "height": 256,
+      "border_image_slice": 20,
+      "chroma_source_sha256": "d4ba89dabfd1d6f69f47d9515af4c25f12322c9078fb7da7ecfaded642050432",
+      "chroma_intermediate_sha256": "32f4c3c796b0285cacc196a1c1c868cc7bf202f8a95ba32d88e9b2300f041005",
+      "prompt_summary": "Compact aged-brass and warm-copper priority frame over charcoal steel, with squared corner caps, dark rivets, tileable edges, and a flat chroma center.",
+      "purpose": "Priority panels, selected states, and primary controls",
+      "permitted_visibility": "public",
+      "subject_class": "interface_only"
+    },
+    {
+      "path": "panel-frame-steel.png",
+      "sha256": "52b8518423f95f150a791ea8b6d2a954e0f89a8d8968deb7f3808bc3d534fbbf",
+      "width": 256,
+      "height": 256,
+      "border_image_slice": 20,
+      "chroma_source_sha256": "e64d852411780809bf58743e8c24f6f3fb75aa97a8b93e9406e05542d9c7895e",
+      "chroma_intermediate_sha256": "073141900049120bf5a355765246e8bbbb0ccbd0f8a7d2dfe0f624cbfd906ed4",
+      "prompt_summary": "Restrained dark-andesite and blackened-steel panel frame with compact brackets, tiny brass fasteners, sparse rivets, tileable edges, and a flat chroma center.",
+      "purpose": "Neutral panels, tables, pickers, slots, and secondary controls",
+      "permitted_visibility": "public",
+      "subject_class": "interface_only"
+    },
+    {
+      "path": "studio-frame-heavy.png",
+      "sha256": "04c05b91c7f06ed0b8fa768cd9027d676caec1fb26dcc961fc65224355f3626f",
+      "width": 512,
+      "height": 512,
+      "border_image_slice": 56,
+      "chroma_source_sha256": "8b2cd2bb1f7e2f72b19c52fab234a7407fa3fe113eb24f5d61d009c4ab5f8eaa",
+      "chroma_intermediate_sha256": "950eadda84e082904a0103bb8adde7bdabfcf0c5f8cbbb321530a3ffc2bf46be",
+      "prompt_summary": "Heavy charcoal and blackened-andesite structural frame with aged-brass corner clamps, square steel rivets, a copper inner lip, tileable rails, and a flat chroma center.",
+      "purpose": "Heavy outer Studio shell frame",
+      "permitted_visibility": "public",
+      "subject_class": "interface_only"
+    }
+  ]
+}

@@ -14,6 +14,7 @@ test("browses the Git-published wiki and searches Squirtle", async ({ page }) =>
 
 test("edits and approves an exact Squirtle revision", async ({ page }) => {
   await page.goto("/studio/pokemon/squirtle");
+  await expect(page.getByText("Safe fixture", { exact: true })).toBeVisible();
   await page.getByLabel(/Efficiency multiplier/u).fill("1.25");
   await page
     .getByLabel(/Public balance rationale/u)
