@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { STUDIO_LEFT_PANEL_COOKIE, STUDIO_RIGHT_PANEL_COOKIE } from "./studio-preferences";
 import { StudioShell } from "./studio-shell";
@@ -56,18 +56,28 @@ describe("StudioShell", () => {
   it("persists desktop panel preferences and marks the active route", () => {
     const { container } = renderShell();
     const shell = container.querySelector(".studio-shell");
+    const sidebar = screen.getByRole("complementary");
+    const heading = container.querySelector(".studio-sidebar-heading");
 
     expect(screen.getByRole("link", { name: "Squirtle" })).toHaveAttribute("aria-current", "page");
-    fireEvent.click(screen.getAllByRole("button", { name: "Hide navigation" }).at(0)!);
+    expect(heading).toContainElement(
+      within(sidebar).getByRole("button", { name: "Hide navigation" }),
+    );
+    expect(within(sidebar).getByText("Development studio")).toBeInTheDocument();
+    expect(sidebar.querySelector(".studio-brand-mark")).toHaveAttribute("width", "124");
+
+    fireEvent.click(within(sidebar).getByRole("button", { name: "Hide navigation" }));
     expect(shell).toHaveAttribute("data-left-collapsed", "true");
     expect(document.cookie).toContain(`${STUDIO_LEFT_PANEL_COOKIE}=collapsed`);
+    expect(within(sidebar).getByRole("button", { name: "Show navigation" })).toBeInTheDocument();
+    expect(sidebar.querySelector(".studio-brand-mark")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Hide inspector" }));
     expect(shell).toHaveAttribute("data-right-collapsed", "true");
     expect(document.cookie).toContain(`${STUDIO_RIGHT_PANEL_COOKIE}=collapsed`);
   });
 
-  it("uses a dismissible navigation drawer at compact widths", () => {
+  it("uses a dismissible navigation drawer at compact widths", async () => {
     installMatchMedia(true);
     const { container } = renderShell();
     const shell = container.querySelector(".studio-shell");
@@ -79,8 +89,36 @@ describe("StudioShell", () => {
     expect(shell).toHaveAttribute("data-mobile-left-open", "true");
     expect(screen.getByRole("button", { name: "Close open panel" })).toBeInTheDocument();
 
+    const sidebar = container.querySelector<HTMLElement>(".studio-sidebar");
+    expect(sidebar).not.toBeNull();
+    fireEvent.click(within(sidebar!).getByRole("button", { name: "Hide navigation" }));
+    expect(shell).toHaveAttribute("data-mobile-left-open", "false");
+    expect(toolbarLauncher).toHaveFocus();
+
+    fireEvent.click(toolbarLauncher!);
+    expect(shell).toHaveAttribute("data-mobile-left-open", "true");
+
     fireEvent.keyDown(document, { key: "Escape" });
     expect(shell).toHaveAttribute("data-mobile-left-open", "false");
     expect(toolbarLauncher).toHaveFocus();
+
+    const inspectorLauncher = container.querySelector<HTMLButtonElement>(
+      ".studio-inspector-toggle",
+    );
+    expect(inspectorLauncher).not.toBeNull();
+    fireEvent.click(inspectorLauncher!);
+    expect(shell).toHaveAttribute("data-mobile-right-open", "true");
+
+    const inspectorClose = container.querySelector<HTMLButtonElement>(
+      ".studio-mobile-inspector-close",
+    );
+    expect(inspectorClose).not.toBeNull();
+    fireEvent.click(inspectorClose!);
+    expect(shell).toHaveAttribute("data-mobile-right-open", "false");
+    expect(inspectorLauncher).toHaveFocus();
+
+    fireEvent.click(inspectorLauncher!);
+    fireEvent.click(screen.getByRole("button", { name: "Close open panel" }));
+    await waitFor(() => expect(inspectorLauncher).toHaveFocus());
   });
 });

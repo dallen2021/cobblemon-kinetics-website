@@ -1,5 +1,7 @@
 "use client";
 
+import { CaretLeftIcon } from "@phosphor-icons/react/dist/csr/CaretLeft";
+import { CaretRightIcon } from "@phosphor-icons/react/dist/csr/CaretRight";
 import type { Ref } from "react";
 
 export function PanelToggle({
@@ -9,6 +11,7 @@ export function PanelToggle({
   onToggle,
   className,
   buttonRef,
+  appearance = "label",
 }: {
   expanded: boolean;
   label: string;
@@ -16,8 +19,11 @@ export function PanelToggle({
   onToggle: () => void;
   className?: string;
   buttonRef?: Ref<HTMLButtonElement>;
+  appearance?: "label" | "caret";
 }) {
   const action = expanded ? "Hide" : "Show";
+  const accessibleLabel = `${action} ${label}`;
+  const CaretIcon = expanded ? CaretLeftIcon : CaretRightIcon;
   return (
     <button
       ref={buttonRef}
@@ -25,11 +31,19 @@ export function PanelToggle({
       type="button"
       aria-controls={controls}
       aria-expanded={expanded}
-      aria-label={`${action} ${label}`}
+      aria-label={accessibleLabel}
+      data-direction={appearance === "caret" ? (expanded ? "collapse" : "expand") : undefined}
       onClick={onToggle}
+      title={appearance === "caret" ? accessibleLabel : undefined}
     >
-      <span>{action}</span>
-      <span>{label}</span>
+      {appearance === "caret" ? (
+        <CaretIcon aria-hidden className="panel-toggle-arrow" size={18} weight="bold" />
+      ) : (
+        <>
+          <span>{action}</span>
+          <span>{label}</span>
+        </>
+      )}
     </button>
   );
 }
