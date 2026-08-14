@@ -1,0 +1,50 @@
+{
+  "name": "@cobblemon-kinetics/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Private-first development studio and published wiki for Cobblemon Kinetics.",
+  "engines": {
+    "node": "24.x"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "prebuild": "pnpm --filter @cobblemon-kinetics/domain build",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "pnpm e2e:fixture && pnpm e2e:fail-closed",
+    "e2e:fixture": "playwright test --config=playwright.config.ts",
+    "e2e:fail-closed": "playwright test --config=playwright.fail-closed.config.ts"
+  },
+  "dependencies": {
+    "@cobblemon-kinetics/domain": "workspace:*",
+    "@supabase/ssr": "0.12.4",
+    "@supabase/supabase-js": "2.112.3",
+    "@tailwindcss/postcss": "4.3.3",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "next": "16.3.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "tailwindcss": "4.3.3"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.62.1",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.2",
+    "@types/node": "26.2.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "6.0.5",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.1",
+    "jsdom": "30.0.1",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
+  }
+}

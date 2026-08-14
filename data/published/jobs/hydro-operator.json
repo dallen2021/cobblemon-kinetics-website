@@ -1,0 +1,8 @@
+{
+  "format_version": 1,
+  "name": "Hydro Operator",
+  "public_id": "cobblemon_kinetics:job/hydro_operator",
+  "slug": "hydro-operator",
+  "status": "approved",
+  "summary": "A Water-type worker drives an attached Create water wheel through the Hydro Coupler."
+}

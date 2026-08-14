@@ -1,0 +1,96 @@
+{
+  "manifest_version": 1,
+  "approved_at": "2026-08-14",
+  "approved_by": "dallen2021",
+  "approval_status": "maintainer_approved_brand",
+  "source_kind": "project_generated_brand_art",
+  "source_sha256": "ff7831ee36dc9dec613570e8e2e3c8d5f345b28895642565cb3b0fcfd0cea332",
+  "generation_method": "OpenAI built-in image generation",
+  "reference": {
+    "kind": "user-provided generated concept used for symbol and composition only",
+    "sha256": "181230141f4c0b10ddfa2f983109a9654eda32acccab7ba683e4d95531d64884",
+    "committed": false
+  },
+  "prompt_summary": "Original block-game logo with a brass cat-ear gear, graphite paw-shaped kinetic core, ember center, conveyor baseline, and exact Cobblemon Kinetics wordmark; no Pokemon, Minecraft, Cobblemon, or Create asset.",
+  "variant_source_sha256": {
+    "emblem_chroma_source": "d7e154fb5ed8828137a02cee83e2d0f56384666eaf92fd3ea89e07957e1a789a",
+    "wordmark_chroma_source": "c6969f681f33cd259dfa596d7c9a2c9b6da0aaa79691cc283a2fa9af8e0f15df",
+    "lockup_chroma_source": "cb17f058c0788133929343917c42c799253351d9a45dca7f995fc21917eae4ab"
+  },
+  "third_party_visual_references": [],
+  "usage_boundary": "Project identity and marketing only. The paw-and-gear mark is not Pokemon species art, a machine registry icon, an item sprite, or a gameplay asset.",
+  "files": [
+    {
+      "repo_path": "apps/web/public/brand/cobblemon-kinetics-lockup-stacked-dark.png",
+      "sha256": "ff7831ee36dc9dec613570e8e2e3c8d5f345b28895642565cb3b0fcfd0cea332",
+      "width": 1254,
+      "height": 1254,
+      "transform": "approved source master",
+      "permitted_visibility": "public"
+    },
+    {
+      "repo_path": "apps/web/public/brand/cobblemon-kinetics-lockup-transparent.png",
+      "sha256": "bada9bca3600addb5ec13c345f800fa0cc91b32644102919ce94f3cf28df52c5",
+      "width": 1254,
+      "height": 1254,
+      "transform": "background isolation at source resolution",
+      "permitted_visibility": "public"
+    },
+    {
+      "repo_path": "apps/web/public/brand/cobblemon-kinetics-emblem.png",
+      "sha256": "95536af12ee8aadff03941963515280c2a6d001e6423afb3175e7e6e1bfea200",
+      "width": 1254,
+      "height": 1254,
+      "transform": "approved emblem extraction on a transparent canvas",
+      "permitted_visibility": "public"
+    },
+    {
+      "repo_path": "apps/web/public/brand/cobblemon-kinetics-wordmark.png",
+      "sha256": "b813b2f4ffadce9ae9f90581ada0776402f777748c80613071830b9fc4ef285f",
+      "width": 1536,
+      "height": 1024,
+      "transform": "approved wordmark extraction on a transparent canvas",
+      "permitted_visibility": "public"
+    },
+    {
+      "repo_path": "apps/web/src/app/icon.png",
+      "sha256": "a881d6d2185c59a6bf36baaad36a3b91864e4cbbe7a8708f31d303b58c9c4071",
+      "width": 512,
+      "height": 512,
+      "transform": "emblem scaled once with Lanczos and centered on #111312",
+      "permitted_visibility": "public"
+    },
+    {
+      "repo_path": "apps/web/src/app/apple-icon.png",
+      "sha256": "6bb11bd0aaa9c1b6784921cd31e168ee71441452cf0262ebd78674540b07fc14",
+      "width": 180,
+      "height": 180,
+      "transform": "emblem scaled once with Lanczos and centered on #111312",
+      "permitted_visibility": "public"
+    },
+    {
+      "repo_path": "apps/web/src/app/favicon.ico",
+      "sha256": "9f368ae8c494eea00256038d20cb7e8ec1d55bc78f9ff9268f1509b4fd495377",
+      "width": 48,
+      "height": 48,
+      "transform": "application icon encoded with Pillow into standards-compatible 16, 32, and 48 pixel PNG-backed ICO entries",
+      "permitted_visibility": "public"
+    },
+    {
+      "repo_path": "apps/web/src/app/opengraph-image.png",
+      "sha256": "a1bfb960d1dda96fffd57b7bb4130e0180a97b96cc225652840e5643437d00fc",
+      "width": 1200,
+      "height": 630,
+      "transform": "transparent lockup scaled once with Lanczos and centered on #111312",
+      "permitted_visibility": "public"
+    },
+    {
+      "repo_path": "apps/web/src/app/twitter-image.png",
+      "sha256": "a1bfb960d1dda96fffd57b7bb4130e0180a97b96cc225652840e5643437d00fc",
+      "width": 1200,
+      "height": 630,
+      "transform": "byte-identical social derivative of opengraph-image.png",
+      "permitted_visibility": "public"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+name: Website bug
+description: Report a reproducible website, studio, auth, publication, or accessibility problem.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched open and closed issues for this problem.
+          required: true
+        - label: I removed secrets, cookies, private notes, workbook content, and personal paths.
+          required: true
+        - label: This is not a Minecraft gameplay or mod-loader problem.
+          required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Public website or wiki
+        - Private studio
+        - Authentication or access
+        - Publication or reconciliation
+        - Importer or data tooling
+        - Local Supabase
+        - Accessibility or responsive layout
+        - Build or contributor tooling
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Explain the expected and actual behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction
+      description: Provide the smallest safe set of steps, route, and test data needed.
+    validations:
+      required: true
+  - type: input
+    id: commit
+    attributes:
+      label: Commit or deployment
+      placeholder: Commit SHA or Vercel deployment URL
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include browser, OS, Node version, access mode, and local/hosted Supabase context.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Sanitized evidence
+      description: Add screenshots or logs only after removing private data and credentials.

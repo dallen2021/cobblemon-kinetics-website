@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Minecraft mod issues
+    url: https://github.com/dallen2021/cobblemon-kinetics/issues
+    about: Report gameplay, loader, Create/Cobblemon compatibility, world, or JAR issues in the mod repository.
+  - name: Security report
+    url: https://github.com/dallen2021/cobblemon-kinetics-website/security/advisories/new
+    about: Privately report vulnerabilities. Do not publish exploit details in an issue.

@@ -1,0 +1,17 @@
+{
+  "manifest_version": 2,
+  "reviewed_at": "2026-08-14",
+  "provider": "project_original",
+  "rights_status": "approved_interface_only",
+  "usage_boundary": "Neutral website empty states only. This file must not represent Pokemon, workers, Minecraft or Create machines, registry objects, or gameplay scenes.",
+  "third_party_visual_references": [],
+  "files": [
+    {
+      "path": "empty-workbench.webp",
+      "sha256": "35bf85633eb959151cbe8dbaa08d7a120f8afb9fded3f6ad9ea6c84bccfce8aa",
+      "purpose": "Empty and search state illustration",
+      "permitted_visibility": "public",
+      "subject_class": "interface_only"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cobblemonkinetics.dev/schemas/domain-catalog.schema.json",
+  "title": "Cobblemon Kinetics domain catalog",
+  "description": "Generation root used to keep the public TypeScript contract in lockstep with every published JSON Schema.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["named", "pokemon", "profile", "assets", "bundle", "manifest", "mod_export"],
+  "properties": {
+    "named": { "$ref": "public-named-record.schema.json" },
+    "pokemon": { "$ref": "public-pokemon.schema.json" },
+    "profile": { "$ref": "work-profile.schema.json" },
+    "assets": { "$ref": "asset-manifest.schema.json" },
+    "bundle": { "$ref": "publication-bundle.schema.json" },
+    "manifest": { "$ref": "published-manifest.schema.json" },
+    "mod_export": { "$ref": "mod-export-manifest.schema.json" }
+  }
+}

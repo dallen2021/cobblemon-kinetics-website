@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cobblemonkinetics.dev/schemas/asset-manifest.schema.json",
+  "title": "Cobblemon Kinetics asset manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "assets"],
+  "properties": {
+    "manifest_version": { "const": 1 },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "asset_key",
+          "bound_record_id",
+          "provider",
+          "source_mod",
+          "source_version",
+          "source_archive_url",
+          "source_archive_sha256",
+          "archive_path",
+          "input_sha256",
+          "output_sha256",
+          "transform",
+          "license_id",
+          "license_url",
+          "attribution",
+          "reviewer",
+          "review_date",
+          "rights_status",
+          "permitted_visibility",
+          "publication_state"
+        ],
+        "properties": {
+          "asset_key": { "$ref": "resource-location.schema.json" },
+          "bound_record_id": { "$ref": "resource-location.schema.json" },
+          "provider": { "type": "string", "pattern": "^[a-z0-9_.-]+$" },
+          "source_mod": { "type": "string", "minLength": 1 },
+          "source_version": { "type": "string", "minLength": 1 },
+          "source_archive_url": { "type": "string", "format": "uri" },
+          "source_archive_sha256": { "$ref": "#/$defs/sha256" },
+          "archive_path": { "type": "string", "minLength": 1 },
+          "input_sha256": { "$ref": "#/$defs/sha256" },
+          "output_sha256": { "$ref": "#/$defs/sha256" },
+          "transform": { "type": "string", "minLength": 1 },
+          "license_id": { "type": "string", "minLength": 1 },
+          "license_url": { "type": "string", "format": "uri" },
+          "attribution": { "type": "string", "minLength": 1 },
+          "reviewer": { "type": "string", "minLength": 1 },
+          "review_date": { "type": "string", "format": "date" },
+          "rights_status": { "enum": ["candidate", "needs_review", "approved", "rejected"] },
+          "permitted_visibility": { "enum": ["private", "public"] },
+          "publication_state": { "enum": ["draft", "published", "withdrawn"] }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

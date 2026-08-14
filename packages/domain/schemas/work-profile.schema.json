@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cobblemonkinetics.dev/schemas/work-profile.schema.json",
+  "title": "Cobblemon Kinetics work profile",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "id",
+    "title",
+    "priority",
+    "status",
+    "selector",
+    "constraints",
+    "workstation",
+    "contribution",
+    "public_rationale"
+  ],
+  "properties": {
+    "format_version": { "const": 1 },
+    "id": { "$ref": "resource-location.schema.json" },
+    "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "priority": { "type": "integer", "minimum": -1000, "maximum": 1000 },
+    "status": { "enum": ["experimental", "approved", "deprecated"] },
+    "selector": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "types", "national_dex"],
+          "properties": {
+            "kind": { "const": "type" },
+            "types": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "resource-location.schema.json" }
+            },
+            "national_dex": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["min", "max"],
+              "properties": {
+                "min": { "type": "integer", "minimum": 1 },
+                "max": { "type": "integer", "minimum": 1 }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "pokemon"],
+          "properties": {
+            "kind": { "const": "pokemon" },
+            "pokemon": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": { "$ref": "resource-location.schema.json" }
+            }
+          }
+        }
+      ]
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requires_owner",
+        "must_be_alive",
+        "must_not_be_fainted",
+        "must_not_be_battling",
+        "must_be_idle"
+      ],
+      "properties": {
+        "requires_owner": { "type": "boolean" },
+        "must_be_alive": { "type": "boolean" },
+        "must_not_be_fainted": { "type": "boolean" },
+        "must_not_be_battling": { "type": "boolean" },
+        "must_be_idle": { "type": "boolean" }
+      }
+    },
+    "workstation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adapter_id", "registry_ids", "required_attachment_tag", "radius"],
+      "properties": {
+        "adapter_id": { "$ref": "resource-location.schema.json" },
+        "registry_ids": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "resource-location.schema.json" }
+        },
+        "required_attachment_tag": { "$ref": "resource-location.schema.json" },
+        "radius": { "type": "number", "exclusiveMinimum": 0, "maximum": 64 }
+      }
+    },
+    "contribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "rpm", "capacity_per_rpm", "efficiency_multiplier"],
+      "properties": {
+        "mode": { "const": "fixed" },
+        "rpm": { "type": "integer", "minimum": 1, "maximum": 256 },
+        "capacity_per_rpm": { "type": "integer", "minimum": 1, "maximum": 1024 },
+        "efficiency_multiplier": { "type": "number", "exclusiveMinimum": 0, "maximum": 16 }
+      }
+    },
+    "public_rationale": { "type": "string", "minLength": 1, "maxLength": 500 }
+  }
+}

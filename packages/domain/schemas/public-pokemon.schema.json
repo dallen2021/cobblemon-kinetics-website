@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cobblemonkinetics.dev/schemas/public-pokemon.schema.json",
+  "title": "Published Pokemon record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format_version",
+    "public_id",
+    "slug",
+    "national_dex",
+    "name",
+    "cobblemon_id",
+    "generation",
+    "current_types",
+    "original_gen1_types",
+    "type_changed",
+    "form",
+    "work_assignments",
+    "source_references"
+  ],
+  "properties": {
+    "format_version": { "const": 1 },
+    "public_id": { "$ref": "resource-location.schema.json" },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 120 },
+    "national_dex": { "type": "integer", "minimum": 1 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "cobblemon_id": { "$ref": "resource-location.schema.json" },
+    "generation": { "type": "integer", "minimum": 1 },
+    "current_types": { "$ref": "#/$defs/typeList" },
+    "original_gen1_types": { "$ref": "#/$defs/typeList" },
+    "type_changed": { "type": "boolean" },
+    "form": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public_id", "slug", "name", "is_default"],
+      "properties": {
+        "public_id": { "$ref": "resource-location.schema.json" },
+        "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 120 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "is_default": { "const": true }
+      }
+    },
+    "facts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "habitat": { "type": ["string", "null"] },
+        "height_m": { "type": ["number", "null"], "minimum": 0 },
+        "weight_kg": { "type": ["number", "null"], "minimum": 0 },
+        "base_stat_total": { "type": ["integer", "null"], "minimum": 0 },
+        "base_stats": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["hp", "attack", "defense", "special_attack", "special_defense", "speed"],
+          "properties": {
+            "hp": { "type": "integer", "minimum": 0 },
+            "attack": { "type": "integer", "minimum": 0 },
+            "defense": { "type": "integer", "minimum": 0 },
+            "special_attack": { "type": "integer", "minimum": 0 },
+            "special_defense": { "type": "integer", "minimum": 0 },
+            "speed": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "standard_abilities": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "hidden_ability": { "type": ["string", "null"] },
+        "capture_rate": { "type": ["integer", "null"], "minimum": 0 },
+        "base_friendship": { "type": ["integer", "null"], "minimum": 0 },
+        "legendary": { "type": "boolean" },
+        "mythical": { "type": "boolean" },
+        "growth_rate": { "type": ["string", "null"] },
+        "shape": { "type": ["string", "null"] },
+        "color": { "type": ["string", "null"] }
+      }
+    },
+    "work_assignments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "work_profile_id",
+          "machine_registry_id",
+          "efficiency_multiplier",
+          "public_rationale"
+        ],
+        "properties": {
+          "work_profile_id": { "$ref": "resource-location.schema.json" },
+          "machine_registry_id": { "$ref": "resource-location.schema.json" },
+          "efficiency_multiplier": { "type": "number", "exclusiveMinimum": 0, "maximum": 16 },
+          "public_rationale": { "type": "string", "minLength": 1, "maxLength": 500 }
+        }
+      }
+    },
+    "source_references": {
+      "type": "array",
+      "items": { "type": "string", "format": "uri" },
+      "uniqueItems": true
+    }
+  },
+  "$defs": {
+    "typeList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 2,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": [
+          "bug",
+          "dark",
+          "dragon",
+          "electric",
+          "fairy",
+          "fighting",
+          "fire",
+          "flying",
+          "ghost",
+          "grass",
+          "ground",
+          "ice",
+          "normal",
+          "poison",
+          "psychic",
+          "rock",
+          "steel",
+          "water"
+        ]
+      }
+    }
+  }
+}

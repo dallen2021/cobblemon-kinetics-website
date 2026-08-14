@@ -1,0 +1,23 @@
+node_modules/
+.next/
+dist/
+coverage/
+playwright-report/
+test-results/
+.private/
+.vercel/
+supabase/.temp/
+supabase/.branches/
+
+# Generated files use their producer's deterministic formatting.
+apps/web/src/types/database.generated.ts
+packages/domain/src/generated/
+
+# Public/exported JSON is canonicalized and hash-addressed by the data tools.
+data/published/
+
+# SQL migrations are reviewed with database-native tooling, never mechanically reformatted.
+supabase/migrations/
+
+# Package-manager output is owned by pnpm.
+pnpm-lock.yaml

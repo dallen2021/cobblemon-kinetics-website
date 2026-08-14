@@ -1,0 +1,27 @@
+version: 1
+default_action: deny
+providers:
+  project_original:
+    enabled: true
+    allow_public: true
+    note: Only artwork created specifically for Cobblemon Kinetics and reviewed for contribution rights.
+  create:
+    enabled: false
+    allow_public: false
+    note: Create resource assets are not approved for website redistribution.
+  minecraft:
+    enabled: false
+    allow_public: false
+    note: Minecraft game files must not be republished as a website asset library.
+  cobblemon:
+    enabled: false
+    allow_public: false
+    note: Asset-layer licensing does not by itself clear underlying character rights.
+  pokeapi:
+    enabled: false
+    allow_public: false
+    note: Sprite licensing is not sufficiently clear for automatic publication.
+  pokemon:
+    enabled: false
+    allow_public: false
+    note: No Pokemon character artwork is approved for redistribution by default.

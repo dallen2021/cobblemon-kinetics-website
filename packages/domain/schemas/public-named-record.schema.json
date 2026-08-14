@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cobblemonkinetics.dev/schemas/public-named-record.schema.json",
+  "title": "Published named record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["format_version", "public_id", "slug", "name", "summary", "status"],
+  "properties": {
+    "format_version": { "const": 1 },
+    "public_id": { "$ref": "resource-location.schema.json" },
+    "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$", "maxLength": 120 },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "summary": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "status": { "enum": ["experimental", "approved", "deprecated"] }
+  }
+}

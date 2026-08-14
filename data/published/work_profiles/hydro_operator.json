@@ -1,0 +1,39 @@
+{
+  "constraints": {
+    "must_be_alive": true,
+    "must_be_idle": true,
+    "must_not_be_battling": true,
+    "must_not_be_fainted": true,
+    "requires_owner": true
+  },
+  "contribution": {
+    "capacity_per_rpm": 64,
+    "efficiency_multiplier": 1,
+    "mode": "fixed",
+    "rpm": 8
+  },
+  "format_version": 1,
+  "id": "cobblemon_kinetics:hydro_operator",
+  "priority": 0,
+  "public_rationale": "Eligible Generation I Water-type workers replace passive flowing-water automation while retaining a visible attached wheel.",
+  "selector": {
+    "kind": "type",
+    "national_dex": {
+      "max": 151,
+      "min": 1
+    },
+    "types": [
+      "cobblemon:water"
+    ]
+  },
+  "status": "approved",
+  "title": "Hydro Operator",
+  "workstation": {
+    "adapter_id": "cobblemon_kinetics:hydro_coupler",
+    "radius": 6,
+    "registry_ids": [
+      "cobblemon_kinetics:hydro_coupler"
+    ],
+    "required_attachment_tag": "create:water_wheels"
+  }
+}

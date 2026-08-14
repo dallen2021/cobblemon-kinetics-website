@@ -1,0 +1,46 @@
+{
+  "name": "cobblemon-kinetics-website",
+  "version": "0.1.0-alpha.1",
+  "private": true,
+  "description": "Private studio, published wiki, data contracts, and deterministic tooling for Cobblemon Kinetics.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dallen2021/cobblemon-kinetics-website.git"
+  },
+  "license": "MPL-2.0",
+  "packageManager": "pnpm@11.19.0",
+  "engines": {
+    "node": ">=24.0.0 <25",
+    "pnpm": ">=11.19.0 <12"
+  },
+  "scripts": {
+    "guard": "node scripts/check-repository-hygiene.mjs",
+    "format": "prettier --write . --ignore-unknown --ignore-path .prettierignore",
+    "format:check": "prettier --check . --ignore-unknown --ignore-path .prettierignore",
+    "build": "pnpm -r --if-present build",
+    "build:web": "pnpm --filter @cobblemon-kinetics/web build",
+    "dev": "pnpm --filter @cobblemon-kinetics/web dev",
+    "lint": "pnpm -r --if-present lint",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm test:scripts && pnpm -r --if-present test",
+    "test:scripts": "node --test scripts/*.test.mjs",
+    "test:web": "pnpm --filter @cobblemon-kinetics/web test",
+    "e2e": "pnpm --filter @cobblemon-kinetics/web e2e",
+    "data:import": "pnpm --filter @cobblemon-kinetics/data-tools import:workbook",
+    "data:apply": "pnpm --filter @cobblemon-kinetics/data-tools apply:publication",
+    "data:verify": "pnpm --filter @cobblemon-kinetics/data-tools verify:published",
+    "data:export-mod": "pnpm --filter @cobblemon-kinetics/data-tools export:mod-work-profiles",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:test": "supabase test db",
+    "db:lint": "supabase db lint --local --fail-on warning",
+    "db:types": "node scripts/generate-database-types.mjs",
+    "access:grant": "pnpm --filter @cobblemon-kinetics/data-tools access:grant",
+    "backup:create": "node scripts/create-prototype-backup.mjs"
+  },
+  "devDependencies": {
+    "prettier": "3.9.6",
+    "supabase": "2.114.0"
+  }
+}

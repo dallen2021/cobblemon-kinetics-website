@@ -1,0 +1,46 @@
+name: Data or schema proposal
+description: Propose a schema, importer, migration, registry, or publication-contract change.
+title: "data: "
+labels:
+  - data
+body:
+  - type: dropdown
+    id: area
+    attributes:
+      label: Proposal area
+      options:
+        - JSON Schema or public projection
+        - Supabase table, RLS policy, RPC, or Storage
+        - Workbook importer or quarantine
+        - Published-data manifest or reconciliation
+        - Mod-profile export contract
+        - Registry or compatibility model
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Current limitation
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed contract
+      description: Include stable IDs, versioning, validation, and public/private boundaries.
+    validations:
+      required: true
+  - type: textarea
+    id: migration
+    attributes:
+      label: Migration and compatibility plan
+      description: Explain forward migration, rollback/correction, existing records, and mod-repository impact.
+    validations:
+      required: true
+  - type: textarea
+    id: tests
+    attributes:
+      label: Required tests
+      description: List schema, pgTAP, importer, deterministic-output, Java-contract, and security cases as applicable.
+    validations:
+      required: true

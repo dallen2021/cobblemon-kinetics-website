@@ -1,0 +1,8 @@
+{
+  "format_version": 1,
+  "name": "Hydro Coupler",
+  "public_id": "cobblemon_kinetics:machine/hydro_coupler",
+  "slug": "hydro-coupler",
+  "status": "approved",
+  "summary": "A reviewed adapter that turns eligible Pokemon work into bounded Create kinetic power."
+}

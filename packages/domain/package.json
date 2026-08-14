@@ -1,0 +1,37 @@
+{
+  "name": "@cobblemon-kinetics/domain",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Language-neutral data contracts for Cobblemon Kinetics.",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./schemas/*": "./schemas/*"
+  },
+  "files": [
+    "dist",
+    "schemas",
+    "src/generated"
+  ],
+  "scripts": {
+    "build": "tsx scripts/generate-types.ts --check && tsc -p tsconfig.build.json",
+    "typecheck": "tsx scripts/generate-types.ts --check && tsc -p tsconfig.json --noEmit",
+    "test": "tsx scripts/generate-types.ts --check && vitest run",
+    "generate:types": "tsx scripts/generate-types.ts",
+    "check:generated": "tsx scripts/generate-types.ts --check"
+  },
+  "dependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "26.2.0",
+    "json-schema-to-typescript": "15.0.4",
+    "tsx": "4.23.12",
+    "typescript": "6.0.3",
+    "vitest": "4.1.10"
+  }
+}

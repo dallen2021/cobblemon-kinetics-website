@@ -1,0 +1,64 @@
+{
+  "format_version": 1,
+  "generation": 1,
+  "pokemon": [
+    {
+      "cobblemon_id": "cobblemon:squirtle",
+      "current_types": [
+        "water"
+      ],
+      "facts": {
+        "base_friendship": 70,
+        "base_stat_total": 314,
+        "base_stats": {
+          "attack": 48,
+          "defense": 65,
+          "hp": 44,
+          "special_attack": 50,
+          "special_defense": 64,
+          "speed": 43
+        },
+        "capture_rate": 45,
+        "color": "Blue",
+        "growth_rate": "Medium Slow",
+        "habitat": "Waters Edge",
+        "height_m": 0.5,
+        "hidden_ability": "Rain Dish",
+        "legendary": false,
+        "mythical": false,
+        "shape": "Upright",
+        "standard_abilities": [
+          "Torrent"
+        ],
+        "weight_kg": 9
+      },
+      "form": {
+        "is_default": true,
+        "name": "Default",
+        "public_id": "cobblemon_kinetics:pokemon/squirtle/default",
+        "slug": "default"
+      },
+      "format_version": 1,
+      "generation": 1,
+      "name": "Squirtle",
+      "national_dex": 7,
+      "original_gen1_types": [
+        "water"
+      ],
+      "public_id": "cobblemon_kinetics:pokemon/squirtle",
+      "slug": "squirtle",
+      "source_references": [
+        "https://pokeapi.co/api/v2/pokemon/7/"
+      ],
+      "type_changed": false,
+      "work_assignments": [
+        {
+          "efficiency_multiplier": 1,
+          "machine_registry_id": "cobblemon_kinetics:hydro_coupler",
+          "public_rationale": "Squirtle is a Water-type worker suited to operating the Hydro Coupler.",
+          "work_profile_id": "cobblemon_kinetics:hydro_operator"
+        }
+      ]
+    }
+  ]
+}

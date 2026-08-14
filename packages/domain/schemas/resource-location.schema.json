@@ -1,0 +1,10 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cobblemonkinetics.dev/schemas/resource-location.schema.json",
+  "title": "Minecraft resource location",
+  "description": "A lower-case namespaced Minecraft resource location.",
+  "type": "string",
+  "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$",
+  "minLength": 3,
+  "maxLength": 255
+}

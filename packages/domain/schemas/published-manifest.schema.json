@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cobblemonkinetics.dev/schemas/published-manifest.schema.json",
+  "title": "Git-published content manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["manifest_version", "schema_version", "batch_id", "bundle_content_sha256", "files"],
+  "properties": {
+    "manifest_version": { "const": 1 },
+    "schema_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "batch_id": { "$ref": "resource-location.schema.json" },
+    "bundle_content_sha256": { "$ref": "#/$defs/sha256" },
+    "files": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256", "kind", "record_count"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^(?:pokemon|jobs|machines|work_profiles|assets)/[a-z0-9_.\\/-]+\\.json$"
+          },
+          "sha256": { "$ref": "#/$defs/sha256" },
+          "kind": {
+            "enum": ["pokemon_collection", "job", "machine", "work_profile", "asset_manifest"]
+          },
+          "record_count": { "type": "integer", "minimum": 0 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

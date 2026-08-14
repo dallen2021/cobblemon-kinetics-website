@@ -1,0 +1,38 @@
+{
+  "batch_id": "cobblemon_kinetics:squirtle_hydro_v1",
+  "bundle_content_sha256": "6d0cfd22821882d8e6dced78c5768d7f9ed99d21ea92d189f8b0bbb0ef93043f",
+  "files": [
+    {
+      "kind": "asset_manifest",
+      "path": "assets/manifest.json",
+      "record_count": 0,
+      "sha256": "d1875bcd35afa39721a4f9e9d99fe7416f9b02b66d0237b55610d519693f85c8"
+    },
+    {
+      "kind": "job",
+      "path": "jobs/hydro-operator.json",
+      "record_count": 1,
+      "sha256": "3295f8048eb0ff3f7ae3088d997b6c7751ae847ba47478da32a6eb057b6b6b56"
+    },
+    {
+      "kind": "machine",
+      "path": "machines/hydro-coupler.json",
+      "record_count": 1,
+      "sha256": "19378b00dbb7624d54e9a2a193dcddaf02e1bcb81a4c199bc266441ca75a81ea"
+    },
+    {
+      "kind": "pokemon_collection",
+      "path": "pokemon/gen1.json",
+      "record_count": 1,
+      "sha256": "e6395bf0de25295be845cea4cf4f73832ba7bbd0eb67df31531bf7b01cdd9579"
+    },
+    {
+      "kind": "work_profile",
+      "path": "work_profiles/hydro_operator.json",
+      "record_count": 1,
+      "sha256": "ee4142ddfe95a8f676e46b8cafe098aeb73f7bd3b542bfb3a38299356e57fe22"
+    }
+  ],
+  "manifest_version": 1,
+  "schema_version": "1.0.0"
+}
