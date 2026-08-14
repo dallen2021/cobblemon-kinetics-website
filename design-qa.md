@@ -10,7 +10,7 @@
 
 ## Visual comparison
 
-The implementation preserves the reference's cream ledger canvas, dark graphite navigation and inspector rails, brass dividers and actions, teal selection states, compact record workspace, and fixed three-column composition. The production interface intentionally uses less decorative chrome than the concept so long forms remain readable and responsive. All text and controls are live interface elements rather than baked into imagery.
+The implementation preserves the reference's cream ledger canvas, dark graphite navigation and inspector rails, brass dividers and actions, teal selection states, compact record workspace, and fixed three-column composition. Three purpose-built, transparent nine-slice textures now supply the heavy outer shell, steel panel/rail edges, and brass priority states. The production interface intentionally uses less decorative chrome than the concept so long forms remain readable and responsive. All text and controls remain live interface elements rather than baked into imagery.
 
 ## Interaction states checked
 
@@ -22,6 +22,8 @@ The implementation preserves the reference's cream ledger canvas, dark graphite 
 - Mobile navigation and inspector drawers at 390 × 844.
 - Escape closes a mobile drawer and returns focus to its trigger.
 - Theme and panel preferences persist across navigation and reload.
+- Heavy, steel, and brass frame assets load and decode in both themes.
+- Generated frame borders remain attached through all four desktop rail states and both mobile drawers.
 
 ## Responsive and accessibility checks
 
@@ -32,12 +34,15 @@ The implementation preserves the reference's cream ledger canvas, dark graphite 
 - Status is communicated with text as well as color.
 - Reduced-motion and forced-color rules remain available.
 - Browser console contains no warnings or errors from the application.
+- Forced-colors mode suppresses decorative raster frames and restores visible system-color borders.
+- Frame PNGs have transparent centers, exact hash-pinned dimensions, and no residual chroma pixels.
 
 ## Asset policy
 
 - The approved Cobblemon Kinetics emblem and wordmark are project-owned generated brand assets with tracked provenance.
 - No generated Pokémon, Poké Ball, Minecraft block, Cobblemon model, Create machine, or add-on machine imagery is shipped.
 - Species and machine records use neutral text treatments until separately sourced assets pass rights and provenance review.
+- Generated borders contain interface geometry only; their prompts, transformations, dimensions, slices, and hashes are recorded in `docs/GENERATED_ART.md` and the public frame manifest.
 
 ## Result
 
