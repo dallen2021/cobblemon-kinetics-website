@@ -27,6 +27,7 @@ packages/*/dist/
 coverage/
 playwright-report/
 test-results/
+*.sarif
 *.tsbuildinfo
 .turbo/
 
