@@ -5,22 +5,25 @@
 - Selected direction: Workshop Ledger.
 - Reference artifact: Workshop Ledger light-mode concept (`exec-60b18ebc-adcb-474c-a6dc-0b97db6b2cbe.png`).
 - Approved brand artifact: Cobblemon Kinetics stacked lockup (`exec-c67882bf-801d-4559-8236-812cfc43a26a.png`).
-- QA viewport: 1504 × 1024.
+- QA viewports: 1487 × 1058 for the approved reference comparison, 1504 × 1024 for the existing desktop contract suite, and 390 × 844 for mobile.
 - Comparison method: reference and live browser capture viewed side by side at the same rendered size.
 
 ## Visual comparison
 
 The implementation preserves the reference's cream ledger canvas, dark graphite navigation and inspector rails, brass dividers and actions, teal selection states, compact record workspace, and fixed three-column composition. Three purpose-built, transparent nine-slice textures now supply the heavy outer shell, steel panel/rail edges, and brass priority states. The production interface intentionally uses less decorative chrome than the concept so long forms remain readable and responsive. All text and controls remain live interface elements rather than baked into imagery.
 
+The navigation refinement matches the requested hierarchy: the project emblem renders at 124 × 124 px above a 16 px live brand name, while the navigation control is now a single caret on the far-right edge of the same 44 px row as “Development studio.” Collapsed mode retains a square 52 × 52 px emblem and reverses the caret without distorting the logo.
+
 ## Interaction states checked
 
 - Light theme with both rails expanded at 1504 × 1024.
 - Dark theme with both rails expanded.
 - Left rail collapsed with the brand emblem retained.
+- Left navigation caret aligned to the sidebar's inner divider, with a 44 × 44 px target and no label overlap.
 - Right inspector collapsed with a persistent reopen control.
 - Both rails collapsed and restored after reload.
 - Mobile navigation and inspector drawers at 390 × 844.
-- Escape closes a mobile drawer and returns focus to its trigger.
+- The internal caret, inspector close control, scrim, and Escape close mobile drawers and return focus to the correct toolbar trigger.
 - Theme and panel preferences persist across navigation and reload.
 - Heavy, steel, and brass frame assets load and decode in both themes.
 - Generated frame borders remain attached through all four desktop rail states and both mobile drawers.
@@ -30,6 +33,7 @@ The implementation preserves the reference's cream ledger canvas, dark graphite 
 - No horizontal overflow at 1504 px or 390 px.
 - Body copy remains at least 16 px and primary controls remain 44 px or taller.
 - Panel controls expose `aria-expanded` and `aria-controls` state.
+- Caret controls retain full “Hide navigation” and “Show navigation” accessible names and focus-visible treatment despite having no visible text.
 - Hidden drawer content is removed from keyboard interaction.
 - Status is communicated with text as well as color.
 - Reduced-motion and forced-color rules remain available.

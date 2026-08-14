@@ -95,7 +95,9 @@ export function StudioShell({
   function toggleLeftPanel(): void {
     if (isMobile) {
       setRightDrawerOpen(false);
-      setLeftDrawerOpen((open) => !open);
+      const nextOpen = !leftDrawerOpen;
+      setLeftDrawerOpen(nextOpen);
+      if (!nextOpen) leftToggleRef.current?.focus();
       return;
     }
     setLeftCollapsed((collapsed) => {
@@ -108,7 +110,9 @@ export function StudioShell({
   function toggleRightPanel(): void {
     if (isMobile) {
       setLeftDrawerOpen(false);
-      setRightDrawerOpen((open) => !open);
+      const nextOpen = !rightDrawerOpen;
+      setRightDrawerOpen(nextOpen);
+      if (!nextOpen) rightToggleRef.current?.focus();
       return;
     }
     setRightCollapsed((collapsed) => {
@@ -119,8 +123,14 @@ export function StudioShell({
   }
 
   function closeMobilePanels(): void {
+    const restoreLeftFocus = leftDrawerOpen;
+    const restoreRightFocus = rightDrawerOpen;
     setLeftDrawerOpen(false);
     setRightDrawerOpen(false);
+    window.requestAnimationFrame(() => {
+      if (restoreLeftFocus) leftToggleRef.current?.focus();
+      if (restoreRightFocus) rightToggleRef.current?.focus();
+    });
   }
 
   return (
@@ -137,25 +147,27 @@ export function StudioShell({
             alt=""
             aria-hidden="true"
             className="studio-brand-mark"
-            height={72}
+            height={124}
             preload
+            sizes="124px"
             src="/brand/cobblemon-kinetics-emblem.png"
-            width={72}
+            width={124}
           />
           <div className="studio-brand-copy">
             <strong>Cobblemon Kinetics</strong>
           </div>
         </div>
-        <PanelToggle
-          className="studio-panel-toggle studio-navigation-toggle"
-          controls="studio-navigation"
-          expanded={leftExpanded}
-          label="navigation"
-          onToggle={toggleLeftPanel}
-        />
         <div className="studio-sidebar-heading">
           <p className="eyebrow">Development studio</p>
           <h2>Gen 1 workshop</h2>
+          <PanelToggle
+            appearance="caret"
+            className="studio-panel-toggle studio-navigation-toggle"
+            controls="studio-navigation"
+            expanded={leftExpanded}
+            label="navigation"
+            onToggle={toggleLeftPanel}
+          />
         </div>
         <nav aria-label="Studio navigation">
           {sections.map(([label, href]) => (

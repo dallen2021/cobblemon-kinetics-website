@@ -81,8 +81,49 @@ test("keeps generated frames stable through themes and every desktop collapse st
   await openStudio(page);
 
   const shell = page.locator(".studio-shell");
+  const sidebar = page.locator(".studio-sidebar");
   const navigationToggle = page.locator(".studio-navigation-toggle");
   const inspectorToggle = page.locator(".studio-inspector-toggle");
+
+  const expandedHeaderGeometry = await page.evaluate(() => {
+    const logo = document.querySelector<HTMLElement>(".studio-brand-mark");
+    const brandName = document.querySelector<HTMLElement>(".studio-brand-copy strong");
+    const sectionLabel = document.querySelector<HTMLElement>(".studio-sidebar-heading .eyebrow");
+    const arrow = document.querySelector<HTMLElement>(".studio-navigation-toggle");
+    const sidebar = document.querySelector<HTMLElement>(".studio-sidebar");
+    if (!logo || !brandName || !sectionLabel || !arrow || !sidebar) return null;
+    const logoBox = logo.getBoundingClientRect();
+    const brandBox = brandName.getBoundingClientRect();
+    const labelBox = sectionLabel.getBoundingClientRect();
+    const arrowBox = arrow.getBoundingClientRect();
+    const sidebarBox = sidebar.getBoundingClientRect();
+    const sidebarInnerRight =
+      sidebarBox.right - Number.parseFloat(getComputedStyle(sidebar).borderRightWidth);
+    return {
+      arrowHeight: arrowBox.height,
+      arrowWidth: arrowBox.width,
+      brandFits: brandName.scrollWidth <= brandName.clientWidth + 1,
+      brandFontSize: Number.parseFloat(getComputedStyle(brandName).fontSize),
+      centersApart: Math.abs(
+        labelBox.top + labelBox.height / 2 - (arrowBox.top + arrowBox.height / 2),
+      ),
+      headingClearance: arrowBox.left - labelBox.right,
+      rightEdgeDistance: Math.abs(sidebarInnerRight - arrowBox.right),
+      logoWidth: logoBox.width,
+      brandWidth: brandBox.width,
+    };
+  });
+
+  expect(expandedHeaderGeometry).not.toBeNull();
+  expect(expandedHeaderGeometry?.logoWidth).toBeGreaterThanOrEqual(120);
+  expect(expandedHeaderGeometry?.brandFontSize).toBeGreaterThanOrEqual(16);
+  expect(expandedHeaderGeometry?.brandFits).toBe(true);
+  expect(expandedHeaderGeometry?.brandWidth).toBeGreaterThan(0);
+  expect(expandedHeaderGeometry?.arrowWidth).toBeGreaterThanOrEqual(44);
+  expect(expandedHeaderGeometry?.arrowHeight).toBeGreaterThanOrEqual(44);
+  expect(expandedHeaderGeometry?.centersApart).toBeLessThanOrEqual(2);
+  expect(expandedHeaderGeometry?.headingClearance).toBeGreaterThanOrEqual(0);
+  expect(expandedHeaderGeometry?.rightEdgeDistance).toBeLessThanOrEqual(2);
 
   await expect(shell).toHaveAttribute("data-left-collapsed", "false");
   await expect(shell).toHaveAttribute("data-right-collapsed", "false");
@@ -98,8 +139,19 @@ test("keeps generated frames stable through themes and every desktop collapse st
   await navigationToggle.click();
   await expect(shell).toHaveAttribute("data-left-collapsed", "true");
   await expect(shell).toHaveAttribute("data-right-collapsed", "false");
+  await expect(navigationToggle).toHaveAttribute("aria-label", "Show navigation");
+  await expect(page.locator(".studio-brand-copy")).toBeHidden();
+  await expect(page.locator(".studio-brand-mark")).toBeVisible();
   await expectGeneratedFrame(shell);
   await expectNoDocumentOverflow(page);
+  expect(
+    await sidebar.evaluate((element) => element.scrollWidth - element.clientWidth),
+  ).toBeLessThanOrEqual(1);
+  const collapsedLogoBox = await page.locator(".studio-brand-mark").boundingBox();
+  expect(collapsedLogoBox).not.toBeNull();
+  expect(
+    Math.abs((collapsedLogoBox?.width ?? 0) - (collapsedLogoBox?.height ?? 0)),
+  ).toBeLessThanOrEqual(1);
 
   await navigationToggle.click();
   await inspectorToggle.click();
@@ -123,22 +175,62 @@ test("frames the mobile navigation and inspector drawers without horizontal over
 
   const shell = page.locator(".studio-shell");
   const navigation = page.locator(".studio-sidebar");
+  const navigationLauncher = page.locator(".studio-mobile-navigation-launcher");
   const inspector = page.locator(".editor-inspector");
 
-  await page.locator(".studio-mobile-navigation-launcher").click();
+  await navigationLauncher.click();
   await expect(shell).toHaveAttribute("data-mobile-left-open", "true");
   await expect(navigation).toBeVisible();
   await expectGeneratedFrame(navigation);
   await expectNoDocumentOverflow(page);
 
+  const mobileHeaderGeometry = await page.evaluate(() => {
+    const logo = document.querySelector<HTMLElement>(".studio-brand-mark");
+    const brandName = document.querySelector<HTMLElement>(".studio-brand-copy strong");
+    const arrow = document.querySelector<HTMLElement>(".studio-navigation-toggle");
+    if (!logo || !brandName || !arrow) return null;
+    const logoBox = logo.getBoundingClientRect();
+    const brandBox = brandName.getBoundingClientRect();
+    const arrowBox = arrow.getBoundingClientRect();
+    return {
+      arrowBelowBrand: arrowBox.top >= brandBox.bottom,
+      logoWidth: logoBox.width,
+      noLogoArrowOverlap:
+        logoBox.right <= arrowBox.left ||
+        arrowBox.right <= logoBox.left ||
+        logoBox.bottom <= arrowBox.top ||
+        arrowBox.bottom <= logoBox.top,
+    };
+  });
+  expect(mobileHeaderGeometry?.logoWidth).toBeGreaterThanOrEqual(120);
+  expect(mobileHeaderGeometry?.arrowBelowBrand).toBe(true);
+  expect(mobileHeaderGeometry?.noLogoArrowOverlap).toBe(true);
+
+  await page.locator(".studio-navigation-toggle").click();
+  await expect(shell).toHaveAttribute("data-mobile-left-open", "false");
+  await expect(navigationLauncher).toBeFocused();
+
+  await navigationLauncher.click();
+  await expect(shell).toHaveAttribute("data-mobile-left-open", "true");
+
   await page.keyboard.press("Escape");
   await expect(shell).toHaveAttribute("data-mobile-left-open", "false");
+  await expect(navigationLauncher).toBeFocused();
 
   await page.locator(".studio-inspector-toggle").click();
   await expect(shell).toHaveAttribute("data-mobile-right-open", "true");
   await expect(inspector).toBeVisible();
   await expectGeneratedFrame(inspector);
   await expectNoDocumentOverflow(page);
+
+  await page.locator(".studio-mobile-inspector-close").click();
+  await expect(shell).toHaveAttribute("data-mobile-right-open", "false");
+  await expect(page.locator(".studio-inspector-toggle")).toBeFocused();
+
+  await page.locator(".studio-inspector-toggle").click();
+  await page.getByRole("button", { name: "Close open panel" }).click({ position: { x: 8, y: 8 } });
+  await expect(shell).toHaveAttribute("data-mobile-right-open", "false");
+  await expect(page.locator(".studio-inspector-toggle")).toBeFocused();
 });
 
 test("uses visible fallback borders when forced colors suppress decorative frames", async ({
