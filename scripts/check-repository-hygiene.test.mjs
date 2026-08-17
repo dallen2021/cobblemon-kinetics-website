@@ -55,3 +55,26 @@ test("the website guard rejects Gradle build files and wrapper JARs", () => {
     rmSync(fixture, { recursive: true, force: true });
   }
 });
+
+test("the website guard rejects unreviewed public game imagery", () => {
+  const fixture = mkdtempSync(join(tmpdir(), "kinetics-hygiene-raster-"));
+  try {
+    execFileSync("git", ["init", "--quiet"], { cwd: fixture });
+    mkdirSync(join(fixture, "apps/web/public/pokemon"), { recursive: true });
+    writeFileSync(join(fixture, "apps/web/public/pokemon/squirtle.png"), "not-a-real-png");
+    execFileSync("git", ["add", "apps/web/public/pokemon/squirtle.png"], { cwd: fixture });
+
+    const result = spawnSync(process.execPath, [guardScript], {
+      cwd: fixture,
+      encoding: "utf8",
+    });
+
+    assert.equal(result.status, 1);
+    assert.match(
+      result.stderr,
+      /public raster is not present in the reviewed project-art allowlist/u,
+    );
+  } finally {
+    rmSync(fixture, { recursive: true, force: true });
+  }
+});

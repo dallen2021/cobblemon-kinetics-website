@@ -704,6 +704,41 @@ export type Database = {
           },
         ]
       }
+      machine_research: {
+        Row: {
+          created_at: string
+          planning: Json
+          record_id: string
+          source_key: string | null
+          system_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          planning?: Json
+          record_id: string
+          source_key?: string | null
+          system_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          planning?: Json
+          record_id?: string
+          source_key?: string | null
+          system_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "machine_research_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: true
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       machines: {
         Row: {
           description: string
@@ -733,6 +768,48 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "records"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      pokemon_design_ideas: {
+        Row: {
+          created_at: string
+          planning: Json
+          record_id: string
+          source_key: string | null
+          species_record_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          planning?: Json
+          record_id: string
+          source_key?: string | null
+          species_record_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          planning?: Json
+          record_id?: string
+          source_key?: string | null
+          species_record_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pokemon_design_ideas_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: true
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pokemon_design_ideas_species_record_id_fkey"
+            columns: ["species_record_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_species"
+            referencedColumns: ["record_id"]
           },
         ]
       }
@@ -1130,6 +1207,66 @@ export type Database = {
           },
         ]
       }
+      record_field_provenance: {
+        Row: {
+          created_at: string
+          field_path: string
+          import_run_id: string | null
+          imported_hash: string
+          imported_value: Json
+          overridden_at: string | null
+          overridden_by: string | null
+          record_id: string
+          source_key: string
+          source_row: number
+          source_sheet: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          field_path: string
+          import_run_id?: string | null
+          imported_hash: string
+          imported_value: Json
+          overridden_at?: string | null
+          overridden_by?: string | null
+          record_id: string
+          source_key: string
+          source_row: number
+          source_sheet: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          field_path?: string
+          import_run_id?: string | null
+          imported_hash?: string
+          imported_value?: Json
+          overridden_at?: string | null
+          overridden_by?: string | null
+          record_id?: string
+          source_key?: string
+          source_row?: number
+          source_sheet?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "record_field_provenance_import_run_id_fkey"
+            columns: ["import_run_id"]
+            isOneToOne: false
+            referencedRelation: "import_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "record_field_provenance_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       record_revisions: {
         Row: {
           actor_id: string | null
@@ -1334,6 +1471,48 @@ export type Database = {
           },
         ]
       }
+      type_workshop_plans: {
+        Row: {
+          created_at: string
+          planning: Json
+          record_id: string
+          source_key: string | null
+          type_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          planning?: Json
+          record_id: string
+          source_key?: string | null
+          type_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          planning?: Json
+          record_id?: string
+          source_key?: string | null
+          type_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "type_workshop_plans_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: true
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "type_workshop_plans_type_id_fkey"
+            columns: ["type_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       work_item_assignees: {
         Row: {
           assigned_by: string | null
@@ -1363,6 +1542,42 @@ export type Database = {
           },
           {
             foreignKeyName: "work_item_assignees_work_item_record_id_fkey"
+            columns: ["work_item_record_id"]
+            isOneToOne: false
+            referencedRelation: "work_items"
+            referencedColumns: ["record_id"]
+          },
+        ]
+      }
+      work_item_links: {
+        Row: {
+          created_at: string
+          relation: string
+          target_record_id: string
+          work_item_record_id: string
+        }
+        Insert: {
+          created_at?: string
+          relation?: string
+          target_record_id: string
+          work_item_record_id: string
+        }
+        Update: {
+          created_at?: string
+          relation?: string
+          target_record_id?: string
+          work_item_record_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_item_links_target_record_id_fkey"
+            columns: ["target_record_id"]
+            isOneToOne: false
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_item_links_work_item_record_id_fkey"
             columns: ["work_item_record_id"]
             isOneToOne: false
             referencedRelation: "work_items"
@@ -1493,11 +1708,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_record_comment: {
+        Args: { p_body: string; p_public_id: string }
+        Returns: Json
+      }
+      apply_gen1_workbook_import: {
+        Args: { p_document: Json; p_expected_source_sha256: string }
+        Returns: Json
+      }
       approve_record_revision: {
         Args: { p_expected_revision: number; p_public_id: string }
         Returns: Json
       }
       claim_editor_access: { Args: never; Returns: Json }
+      create_publication_batch: {
+        Args: { p_public_ids: string[] }
+        Returns: Json
+      }
       create_squirtle_publication_batch: {
         Args: { p_expected_revision: number }
         Returns: Json
@@ -1505,6 +1732,20 @@ export type Database = {
       get_editor_record: { Args: { p_public_id: string }; Returns: Json }
       get_publication_bundle: {
         Args: { p_publication_id: string }
+        Returns: Json
+      }
+      get_record_head: { Args: { p_public_id: string }; Returns: Json }
+      list_active_members: { Args: never; Returns: Json }
+      list_editor_records: {
+        Args: {
+          p_cursor?: string
+          p_kind?: string
+          p_limit?: number
+          p_query?: string
+          p_task_status?: string
+          p_type?: string
+          p_workflow?: string
+        }
         Returns: Json
       }
       reconcile_publication_commit: {
@@ -1516,12 +1757,24 @@ export type Database = {
         }
         Returns: Json
       }
+      resolve_record_comment: { Args: { p_comment_id: string }; Returns: Json }
       save_record_revision: {
         Args: {
           p_client_mutation_id: string
           p_expected_revision: number
           p_patch: Json
           p_public_id: string
+        }
+        Returns: Json
+      }
+      set_work_item_assignees: {
+        Args: {
+          p_assignee_ids: string[]
+          p_expected_revision: number
+          p_handoff_note: string
+          p_priority?: string
+          p_public_id: string
+          p_status?: string
         }
         Returns: Json
       }

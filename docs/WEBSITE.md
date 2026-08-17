@@ -87,10 +87,10 @@ pnpm dev
 Stop local services with `pnpm db:stop --no-backup` when finished.
 
 The Supabase CLI's Docker ports may be reachable from the local network rather
-than only from loopback. This repository therefore seeds synthetic Squirtle and
-Hydro data only. Do not load private workbook data into local Supabase on an
-untrusted network; use a host firewall or isolated development VM when private
-data is present, and stop the stack immediately when it is not being tested.
+than only from loopback. Do not load a private workbook into local Supabase on
+an untrusted network; use a host firewall or isolated development VM when
+private data is present, and stop the stack immediately when it is not being
+tested.
 The normal web development command binds Next.js to `127.0.0.1`; any deliberate
 LAN test must keep fixture mode disabled and retain normal authentication.
 
@@ -147,13 +147,27 @@ current typing separately in its normalized intermediate document, derives a
 default-form identity for every species, records field transformations, and
 quarantines flavor text. Passing a prior `import.json` with `--previous`
 classifies rows as imported, updated, or unchanged without mutating either
-source. Review the JSON and Markdown reports before any manual use.
+source. Review the JSON and Markdown reports before any application.
 
-This first slice is deliberately **dry-run only**: it does not write to a local
-or hosted database. Transactional database application, field-level overwrite
-protection, and the full Generation I migration remain a later phase after the
-Squirtle/Hydro workflow proves the contracts. Unsupported CLI flags are
-rejected so a misspelled output or safety option cannot silently pass.
+After review, application is a separate, service-only transaction:
+
+```sh
+pnpm data:apply-import -- \
+  --input .private/migration/review/import.json \
+  --expect-source-sha256 <reviewed-workbook-sha256> \
+  --confirm-apply yes
+```
+
+The command verifies the reviewed source hash, requires an explicit mutation
+confirmation, and refuses an unencrypted hosted application unless a fresh
+ignored backup manifest is supplied with `--backup-manifest`. It imports the
+151 species/default forms, current and original typing, type workshops, design
+ideas, Create-system research, existing backlog, and one neutral unassigned
+design task per species. The same source is an idempotent no-op; missing rows
+never delete records. A later source update preserves the existing record and
+creates private review work instead of overwriting collaboration data.
+Unsupported CLI flags are rejected so a misspelled output or safety option
+cannot silently pass.
 
 The raw workbook and full import reports remain ignored. Rights-cleared public
 records are reproducible from `data/published`, not from a committed workbook.
@@ -201,10 +215,10 @@ not exist in the public bundle schema, so omission does not depend on a fragile
 list of fields to delete.
 
 The mod validates the first work-profile format on server-data reload and
-accepts only registered code-side workstation adapters. The Hydro profile is a
-validated cross-repository contract in this slice; existing Hydro gameplay
-still uses its current config and saved-data path until that migration is
-tested separately.
+accepts only registered code-side workstation adapters. Generic mod gameplay
+loading remains a separate milestone: the existing Hydro behavior still uses
+its current configuration and saved-data path until that migration is tested
+separately.
 
 ## Asset policy
 
@@ -217,6 +231,36 @@ An asset can advance beyond private candidate status only after a human records
 its source archive, exact path and hashes, license, attribution, allowed
 visibility, reviewer, and review date. Public files are immutable and
 content-addressed. Source JARs and unapproved originals never enter Git.
+
+### Local source review
+
+`pnpm assets:import-local` accepts explicit Create and Cobblemon JAR paths and
+versions. It validates regular JAR files, checks ZIP CRC values, accepts only
+traversal-free PNG entries under the exact `assets/create/` and
+`assets/cobblemon/` namespaces, and writes a hash-pinned inventory beneath
+ignored `.private/local-game-assets`.
+
+The local web process reads that inventory only when
+`LOCAL_GAME_ASSET_ROOT=../../.private/local-game-assets` is present in
+`apps/web/.env.local`. The variable must remain absent from every hosted
+environment; production tracing also excludes the entire `.private` tree.
+
+The Studio asset page can browse every imported PNG, but the delivery route is
+available only on a loopback, non-production origin, requires an active member,
+rehashes every returned file, and sends `private, no-store`. The source view is
+for evaluation only: Pokémon textures are often model UV maps rather than
+finished portraits, while Create machines are assembled from models and many
+textures rather than distributed as standalone icons. Nothing in this workflow
+changes `data/asset-policy.yml` or the empty public asset manifest.
+
+Official source terms remain decisive:
+
+- [Create asset license](https://github.com/Creators-of-Create/Create/blob/ac0c444d9828da3453ae8cc65338e8de063286fb/LICENSE.md)
+  marks `src/main/resources/assets/` All Rights Reserved.
+- [Cobblemon code license](https://gitlab.com/cable-mc/cobblemon/-/blob/1.7.3/LICENSE)
+  is MPL-2.0 but cannot grant rights its contributors do not own.
+- [Pokémon's current support guidance](https://support.pokemon.com/hc/en-us/articles/360000634094-Can-I-use-Pok%C3%A9mon-images-or-materials)
+  asks projects not to use or associate Pokémon characters, names, and designs.
 
 ## Private prototype deployment
 

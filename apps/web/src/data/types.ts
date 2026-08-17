@@ -62,24 +62,3 @@ export interface PublishedCatalog {
   compatibility: PublishedCompatibility[];
   versions: PublishedVersion[];
 }
-
-export interface RevisionSummary {
-  revision: number;
-  actor: string;
-  at: string;
-  summary: string;
-}
-
-export interface SquirtleDraft {
-  publicId: "cobblemon_kinetics:pokemon/squirtle";
-  revision: number;
-  workflowState: "draft" | "in_review" | "approved";
-  machineId: string;
-  jobId: string;
-  efficiency: number;
-  publicRationale: string;
-  privateNote: string;
-  updatedAt: string;
-  updatedBy: string;
-  revisions: RevisionSummary[];
-}

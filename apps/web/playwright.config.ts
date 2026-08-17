@@ -12,7 +12,7 @@ const baseURL = configuredBaseURL ?? "http://127.0.0.1:3100";
 
 export default defineConfig({
   testDir: "./e2e",
-  testMatch: ["fixture.spec.ts", "studio-borders.spec.ts"],
+  testMatch: ["fixture.spec.ts", "gen1-studio.spec.ts", "studio-borders.spec.ts"],
   fullyParallel: true,
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,

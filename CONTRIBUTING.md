@@ -106,6 +106,9 @@ and checked in.
 - Keep mod exports explicit. Export only from a clean, committed website
   checkout into ignored `.private/**/mod-export`; tooling must never mutate a
   sibling mod checkout.
+- Keep installed JARs and extracted game/mod imagery under ignored `.private`.
+  Never add a third-party raster to `apps/web/public`; the repository guard
+  allows only the exact reviewed project-art files already recorded there.
 
 ## Supabase migrations
 

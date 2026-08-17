@@ -23,14 +23,16 @@ production-grade content service, and its wiki is not public yet.
   allowlist.
 - Equal `maintainer` authority for Daniel and Jake; neither is a subordinate or
   default owner of project work.
-- A Squirtle → Hydro Coupler editing slice with autosave, immutable revisions,
-  optimistic conflict detection, validation, approval, publication bundles,
-  and Git reconciliation.
+- A private Gen 1 Development Studio Beta: all 151 species have editable draft
+  records, neutral design tasks, autosave, immutable revisions, 20-second
+  stale-record checks, comments, approval, publication bundles, and Git
+  reconciliation.
 - SQL migrations, deny-by-default RLS, Storage policies, pgTAP tests, and
   generated database types.
 - JSON Schema contracts and deterministic public-data tooling.
-- A repeatable workbook dry-run importer that maps the Generation 1 planning
-  workbook while quarantining flavor text.
+- A controlled, hash-locked workbook importer that maps the Generation 1
+  planning workbook transactionally, preserves source provenance and override
+  conflicts, and quarantines flavor text.
 - Original project branding and neutral interface art. Generated Pokémon and
   generated Create-machine substitutes are prohibited.
 
@@ -153,6 +155,32 @@ are not assignees. Assign Daniel, Jake, or another contributor only after an
 explicit decision. Shared ownership uses separate assignee records and a short
 division or handoff note.
 
+### Applying a reviewed Gen 1 workbook locally
+
+First create and review the normalized import document; it stays under ignored
+`.private/` storage:
+
+```sh
+pnpm data:import -- --workbook /path/to/workbook.xlsx --dry-run \
+  --output-dir .private/migration/review
+```
+
+Then, with a local Supabase stack and its service key exported only into the
+current shell, apply the exact reviewed source hash:
+
+```sh
+pnpm data:apply-import -- \
+  --input .private/migration/review/import.json \
+  --expect-source-sha256 <reviewed-workbook-sha256> \
+  --confirm-apply yes
+```
+
+The same source hash is an idempotent no-op. A hosted apply additionally
+requires a newly created encrypted backup manifest under `.private/backups`.
+Missing workbook rows never delete records; a changed imported source preserves
+the existing record and becomes a private review conflict rather than
+overwriting collaboration work.
+
 ## Artwork policy
 
 Third-party artwork is denied by default. This repository does not extract or
@@ -164,6 +192,29 @@ text, neutral source-required states, original panels, and project branding.
 The approved Cobblemon Kinetics logo is project-owned generated brand art. Its
 provenance and allowed uses are documented in
 [`docs/GENERATED_ART.md`](docs/GENERATED_ART.md).
+
+Maintainers can inspect exact PNG source files from locally installed Create
+and Cobblemon JARs without adding them to the repository or deployment:
+
+Keep `LOCAL_GAME_ASSET_ROOT=../../.private/local-game-assets` in the local
+`apps/web/.env.local`; never configure that variable in Vercel.
+
+```sh
+pnpm assets:import-local -- \
+  --create-jar <path-to-create.jar> \
+  --create-version 6.0.10 \
+  --cobblemon-jar <path-to-cobblemon.jar> \
+  --cobblemon-version 1.7.3
+```
+
+The command extracts only namespaced PNG entries into ignored
+`.private/local-game-assets`, records the JAR and file hashes, and makes them
+available on the authenticated Studio asset page only from a loopback,
+non-production server. It never approves those files for public use. Create's
+asset directory is All Rights Reserved, and a Cobblemon contributor license
+does not clear underlying Pokémon character rights; written rights-holder
+permission is still required before any subject image can enter Git, Vercel,
+public Storage, or a publication bundle.
 
 ## Contributing and governance
 

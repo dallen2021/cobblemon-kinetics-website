@@ -1,4 +1,4 @@
-import type { PublishedCatalog, SquirtleDraft } from "./types";
+import type { PublishedCatalog } from "./types";
 
 export const fixtureCatalog: PublishedCatalog = {
   schemaVersion: "1.0.0",
@@ -66,41 +66,6 @@ export const fixtureCatalog: PublishedCatalog = {
       cobblemon: "1.7.3",
       create: "6.0.10",
       status: "Supported prototype",
-    },
-  ],
-};
-
-export const fixtureSquirtleDraft: SquirtleDraft = {
-  publicId: "cobblemon_kinetics:pokemon/squirtle",
-  revision: 12,
-  workflowState: "draft",
-  machineId: "cobblemon_kinetics:hydro_coupler",
-  jobId: "cobblemon_kinetics:hydro_operator",
-  efficiency: 1,
-  publicRationale:
-    "A neutral baseline keeps the first prototype focused on reliability before species-specific balance.",
-  privateNote:
-    "Fixture-only note: confirm the coupler shutdown animation before marking implementation-ready.",
-  updatedAt: "2026-08-14T17:00:00.000Z",
-  updatedBy: "Fixture maintainer",
-  revisions: [
-    {
-      revision: 12,
-      actor: "Fixture maintainer",
-      at: "2026-08-14T17:00:00.000Z",
-      summary: "Clarified the baseline balance rationale.",
-    },
-    {
-      revision: 11,
-      actor: "Fixture maintainer",
-      at: "2026-08-14T16:15:00.000Z",
-      summary: "Assigned the Hydro Coupler machine candidate.",
-    },
-    {
-      revision: 10,
-      actor: "Workbook importer",
-      at: "2026-08-14T15:30:00.000Z",
-      summary: "Created the Squirtle development record.",
     },
   ],
 };
