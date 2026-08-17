@@ -20,11 +20,18 @@
         "properties": {
           "path": {
             "type": "string",
-            "pattern": "^(?:pokemon|jobs|machines|work_profiles|assets)/[a-z0-9_.\\/-]+\\.json$"
+            "pattern": "^(?:pokemon|jobs|machines|work_profiles|blueprints|assets)/[a-z0-9_.\\/-]+\\.json$"
           },
           "sha256": { "$ref": "#/$defs/sha256" },
           "kind": {
-            "enum": ["pokemon_collection", "job", "machine", "work_profile", "asset_manifest"]
+            "enum": [
+              "pokemon_collection",
+              "job",
+              "machine",
+              "work_profile",
+              "blueprint_collection",
+              "asset_manifest"
+            ]
           },
           "record_count": { "type": "integer", "minimum": 0 }
         }

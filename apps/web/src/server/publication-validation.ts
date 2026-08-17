@@ -5,6 +5,7 @@ import assetManifestSchema from "@cobblemon-kinetics/domain/schemas/asset-manife
 import publicationBundleSchema from "@cobblemon-kinetics/domain/schemas/publication-bundle.schema.json";
 import publishedManifestSchema from "@cobblemon-kinetics/domain/schemas/published-manifest.schema.json";
 import publicNamedRecordSchema from "@cobblemon-kinetics/domain/schemas/public-named-record.schema.json";
+import publicBlueprintRecordSchema from "@cobblemon-kinetics/domain/schemas/public-blueprint-record.schema.json";
 import publicPokemonSchema from "@cobblemon-kinetics/domain/schemas/public-pokemon.schema.json";
 import resourceLocationSchema from "@cobblemon-kinetics/domain/schemas/resource-location.schema.json";
 import workProfileSchema from "@cobblemon-kinetics/domain/schemas/work-profile.schema.json";
@@ -34,6 +35,7 @@ addFormats(ajv);
 for (const schema of [
   resourceLocationSchema,
   publicNamedRecordSchema,
+  publicBlueprintRecordSchema,
   publicPokemonSchema,
   workProfileSchema,
   assetManifestSchema,

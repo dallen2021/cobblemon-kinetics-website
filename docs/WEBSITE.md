@@ -172,6 +172,33 @@ cannot silently pass.
 The raw workbook and full import reports remain ignored. Rights-cleared public
 records are reproducible from `data/published`, not from a committed workbook.
 
+## Evolution-aware workspaces and Kinetic Blueprint
+
+The Gen 1 import is reconciled into 78 evolution families and 72 explicit
+form-to-form edges. Eevee has three outgoing branches; Hitmonlee and Hitmonchan
+share a family without an invented edge. Facts remain species/form-specific and
+never inherit. Growth rate, habitat, shape, color, and ordered types use stable
+controlled slugs; genus uses imported suggestions but permits a review-flagged
+new value.
+
+Each family owns one shared Blueprint board. Its Worker, Capability, Job,
+Worksite, Interlock, and Result nodes reference canonical records. Durable
+relationships use typed ports and are validated in both the browser and
+PostgreSQL. Canvas and accessible Outline modes edit one staged operation set;
+Apply checks the board revision and every record head, writes immutable record
+revisions and audit events, then advances the shared board once. Draft catalog
+stubs require their description before Apply. Removing a card from a board does
+not delete or archive its record.
+
+Capabilities use explicit tiers 1–4. Evolved forms must record Keep, Raise,
+Lower, Replace, Remove, or Add; no stat or efficiency is inferred. Editing a
+parent relationship marks reviewed descendants outdated without changing their
+values. Shared positions, groups, and annotations live on the board, while each
+maintainer's viewport, filters, hidden nodes, and last view remain private.
+Compatibility and Blueprint-aware publication read the same relationship
+records. Only exact approved revisions and their approved dependency closure
+enter a deterministic public bundle.
+
 ## Publication workflow
 
 1. A maintainer validates and approves an exact record revision.

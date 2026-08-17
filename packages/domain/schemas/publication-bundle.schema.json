@@ -24,7 +24,11 @@
         "pokemon": { "type": "array", "items": { "$ref": "public-pokemon.schema.json" } },
         "jobs": { "type": "array", "items": { "$ref": "public-named-record.schema.json" } },
         "machines": { "type": "array", "items": { "$ref": "public-named-record.schema.json" } },
-        "work_profiles": { "type": "array", "items": { "$ref": "work-profile.schema.json" } }
+        "work_profiles": { "type": "array", "items": { "$ref": "work-profile.schema.json" } },
+        "blueprints": {
+          "type": "array",
+          "items": { "$ref": "public-blueprint-record.schema.json" }
+        }
       }
     },
     "asset_manifest": { "$ref": "asset-manifest.schema.json" },

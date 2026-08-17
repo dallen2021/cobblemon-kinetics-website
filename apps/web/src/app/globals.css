@@ -2746,6 +2746,30 @@ html[data-theme="dark"] .studio-shell {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.compatibility-links {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.compatibility-links li {
+  min-width: 0;
+  padding-block: 0.25rem;
+}
+.compatibility-links strong,
+.compatibility-links span {
+  display: block;
+}
+.compatibility-links strong {
+  text-transform: capitalize;
+}
+.compatibility-links span {
+  margin-top: 0.25rem;
+  color: var(--studio-muted);
+  font: 720 0.62rem/1.3 var(--font-mono);
+  text-transform: uppercase;
+}
 .matrix-toggle {
   display: flex !important;
   align-items: center;
@@ -3265,6 +3289,7 @@ html[data-theme="dark"] .studio-shell {
   .machine-picker label,
   .studio-shell .item-slot,
   .inspector-block,
+  .publication-block,
   .local-asset-sources article,
   .local-asset-filter,
   .local-asset-tile {
@@ -3298,5 +3323,1135 @@ html[data-theme="dark"] .studio-shell {
   .local-asset-filter,
   .local-asset-tile {
     border-width: 1px;
+  }
+}
+
+/* Kinetic Blueprint and evolution-aware Pokémon workspace */
+.evolution-workspace {
+  --blueprint-worker: #4b8f8b;
+  --blueprint-capability: #c59a3c;
+  --blueprint-job: #b97842;
+  --blueprint-worksite: #68716d;
+  --blueprint-interlock: #b45448;
+  --blueprint-result: #6c8d58;
+}
+
+.evolution-workspace .editor-canvas {
+  padding: 0;
+}
+
+.evolution-record-header {
+  min-height: 124px;
+  padding: 1rem clamp(1.2rem, 2.6vw, 2.5rem);
+}
+
+.evolution-record-header .worker-record-token {
+  width: 82px;
+  font: 900 1.25rem/1 var(--font-mono);
+}
+
+.pokemon-workspace-tabs {
+  position: sticky;
+  z-index: 16;
+  top: var(--studio-toolbar-height);
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  padding: 0 clamp(1.2rem, 2.6vw, 2.5rem);
+  border-bottom: 1px solid var(--studio-line);
+  background: color-mix(in srgb, var(--studio-canvas) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+
+.pokemon-workspace-tabs button {
+  display: inline-flex;
+  min-width: max-content;
+  min-height: 48px;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.7rem 1rem;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  color: var(--studio-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.pokemon-workspace-tabs button[aria-selected="true"] {
+  border-bottom-color: var(--studio-brass);
+  color: var(--studio-text);
+  background: color-mix(in srgb, var(--studio-brass) 8%, transparent);
+}
+
+.pokemon-workspace-tabs svg,
+.overview-card > header svg,
+.overview-metrics svg,
+.section-intro svg,
+.inspector-title svg,
+.blueprint-toolbar svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: none;
+}
+
+.pokemon-overview,
+.pokemon-facts,
+.pokemon-discussion {
+  padding: 1.15rem clamp(1.2rem, 2.6vw, 2.5rem) 2rem;
+}
+
+.evolution-ribbon,
+.overview-card,
+.overview-metrics article,
+.pokemon-facts .section-intro,
+.kinetic-blueprint {
+  border: var(--studio-frame-panel-size) solid var(--studio-line);
+  border-image-source: var(--frame-panel-steel-image);
+  border-image-slice: var(--frame-panel-slice);
+  border-image-repeat: round;
+  background: var(--studio-panel);
+  box-shadow: var(--studio-shadow);
+}
+
+.evolution-ribbon {
+  padding: 1rem 1.15rem;
+}
+
+.evolution-ribbon > header,
+.overview-card > header,
+.section-intro,
+.inspector-title,
+.blueprint-toolbar,
+.blueprint-selection-inspector > header,
+.blueprint-context-menu > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.evolution-ribbon > header span {
+  max-width: 42ch;
+  color: var(--studio-muted);
+  font-size: 0.75rem;
+  text-align: right;
+}
+
+.evolution-ribbon h2,
+.overview-card h2,
+.section-intro h2,
+.blueprint-toolbar h2,
+.inspector-title h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.evolution-ribbon ol {
+  display: flex;
+  align-items: stretch;
+  gap: 0.8rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.evolution-ribbon li {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+}
+
+.evolution-ribbon li a {
+  display: grid;
+  width: 100%;
+  min-height: 68px;
+  grid-template-columns: 48px 1fr;
+  align-content: center;
+  gap: 0.15rem 0.7rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--studio-line);
+  color: var(--studio-text);
+  text-decoration: none;
+  background: var(--studio-panel-raised);
+}
+
+.evolution-ribbon li[data-current="true"] a {
+  border-color: var(--studio-teal);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--studio-teal) 42%, transparent);
+}
+
+.evolution-ribbon .record-token {
+  grid-row: 1 / 3;
+  width: 48px;
+  font-size: 0.8rem;
+}
+
+.evolution-ribbon li small {
+  color: var(--studio-muted);
+}
+
+.evolution-ribbon-connector {
+  position: absolute;
+  z-index: 2;
+  left: -0.68rem;
+  color: var(--studio-brass);
+  font-weight: 900;
+}
+
+.overview-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.8rem;
+}
+
+.overview-metrics article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.2rem 0.65rem;
+  min-height: 106px;
+  padding: 0.75rem;
+}
+
+.overview-metrics article > svg {
+  grid-row: 1 / 3;
+  width: 1.65rem;
+  height: 1.65rem;
+  color: var(--studio-brass);
+}
+
+.overview-metrics strong {
+  font: 900 1.3rem/1 var(--font-mono);
+}
+
+.overview-metrics span {
+  color: var(--studio-muted);
+  font-size: 0.7rem;
+}
+
+.overview-metrics progress {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 0.35rem;
+  accent-color: var(--studio-teal);
+}
+
+.overview-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.8rem;
+}
+
+.overview-card {
+  min-width: 0;
+  padding: 1rem;
+}
+
+.overview-card > header {
+  justify-content: flex-start;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--studio-line);
+}
+
+.overview-card > header svg {
+  color: var(--studio-brass);
+}
+
+.overview-card .field-label,
+.pokemon-discussion .field-label,
+.blueprint-selection-inspector .field-label,
+.blueprint-context-menu .field-label {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.7rem;
+  color: var(--studio-muted);
+  font: 780 0.67rem/1.3 var(--font-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.overview-card > ul {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.75rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.overview-card > ul li,
+.overview-card > ul li a {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem;
+  border: 1px solid var(--studio-line);
+  color: var(--studio-text);
+  text-decoration: none;
+  background: var(--studio-panel-raised);
+}
+
+.overview-card > ul li a {
+  width: 100%;
+  padding: 0;
+  border: 0;
+}
+
+.overview-card > ul li span {
+  color: var(--studio-muted);
+  font-size: 0.68rem;
+  text-align: right;
+}
+
+.overview-card input,
+.overview-card select,
+.overview-card textarea,
+.pokemon-discussion textarea,
+.fact-field input,
+.fact-field select,
+.blueprint-selection-inspector select,
+.blueprint-selection-inspector textarea,
+.blueprint-context-menu input,
+.blueprint-context-menu textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--studio-line-strong);
+  border-radius: 1px;
+  color: var(--studio-text);
+  background: var(--studio-input);
+}
+
+.capability-summary-list,
+.revision-list,
+.comment-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.capability-summary-list li,
+.revision-list li,
+.comment-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem;
+  border: 1px solid var(--studio-line);
+  background: var(--studio-panel-raised);
+}
+
+.capability-summary-list li[data-outdated="true"] {
+  border-color: var(--red-500);
+}
+
+.capability-summary-list li div,
+.revision-list li div,
+.comment-list li {
+  min-width: 0;
+}
+
+.capability-summary-list li strong,
+.capability-summary-list li span,
+.revision-list strong,
+.revision-list small,
+.comment-list strong,
+.comment-list span,
+.comment-list small {
+  display: block;
+}
+
+.capability-summary-list li span,
+.revision-list small,
+.comment-list small {
+  color: var(--studio-muted);
+  font-size: 0.68rem;
+}
+
+.revision-list > li > span,
+.count-badge {
+  display: grid;
+  min-width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid var(--studio-brass);
+  color: var(--studio-brass);
+  font: 850 0.68rem/1 var(--font-mono);
+}
+
+.ghost-suggestion {
+  margin-top: 0.7rem;
+  padding: 0.7rem;
+  border: 1px dashed var(--studio-teal);
+  color: var(--studio-muted);
+  background: color-mix(in srgb, var(--studio-teal) 5%, transparent);
+}
+
+.ghost-suggestion strong,
+.ghost-suggestion span {
+  display: block;
+}
+
+.ghost-suggestion span {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+}
+
+.ghost-suggestion[data-accepted="true"] {
+  border-style: solid;
+  border-color: var(--green-500);
+  background: color-mix(in srgb, var(--green-500) 7%, transparent);
+}
+
+.section-intro {
+  margin-bottom: 0.8rem;
+  padding: 0.9rem 1rem;
+}
+
+.fact-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.fact-field {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--studio-line);
+  background: var(--studio-panel);
+}
+
+.fact-field > span {
+  color: var(--studio-text);
+  font: 800 0.72rem/1.3 var(--font-mono);
+  text-transform: uppercase;
+}
+
+.fact-field-readonly output {
+  min-height: 44px;
+  padding: 0.65rem 0.75rem;
+  border: 1px dashed var(--studio-line-strong);
+  color: var(--studio-muted);
+  background: var(--studio-panel-raised);
+}
+
+.fact-source {
+  color: var(--studio-muted);
+  font-size: 0.64rem;
+}
+
+.provenance-summary {
+  margin-top: 0.8rem;
+  padding: 0.85rem;
+  border: 1px solid var(--studio-line);
+  background: var(--studio-panel);
+}
+
+.provenance-summary summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.provenance-summary ul {
+  margin-bottom: 0;
+}
+
+.discussion-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, 0.8fr);
+  gap: 0.8rem;
+}
+
+.discussion-grid > section {
+  margin: 0;
+  padding: 0.9rem;
+  border: var(--studio-frame-panel-size) solid var(--studio-line);
+  border-image-source: var(--frame-panel-steel-image);
+  border-image-slice: var(--frame-panel-slice);
+  border-image-repeat: round;
+  background: var(--studio-panel);
+  box-shadow: var(--studio-shadow);
+}
+
+.discussion-grid > .private-section,
+.discussion-grid > .publication-block {
+  border-image-source: var(--frame-panel-brass-image);
+}
+
+.comment-list li {
+  display: grid;
+  justify-content: stretch;
+}
+
+.evolution-workspace .editor-inspector .inspector-title h2 {
+  color: var(--studio-rail-text);
+  font-size: 0.9rem;
+}
+
+.evolution-workspace .editor-inspector progress {
+  width: 100%;
+  margin-top: 0.6rem;
+  accent-color: var(--studio-teal);
+}
+
+/* Shared family relationship canvas */
+.kinetic-blueprint {
+  position: relative;
+  min-width: 0;
+  margin: 1rem clamp(1rem, 2vw, 1.6rem) 1.6rem;
+  overflow: hidden;
+  color: var(--studio-text);
+}
+
+.blueprint-toolbar {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) auto;
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--studio-line);
+  background: var(--studio-panel);
+}
+
+.blueprint-actions {
+  grid-column: 1 / -1;
+  justify-content: flex-end;
+}
+
+.blueprint-mode-toggle,
+.blueprint-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.blueprint-mode-toggle button[aria-pressed="true"] {
+  border-image-source: var(--frame-panel-brass-image);
+  color: var(--studio-brass);
+}
+
+.blueprint-status,
+.blueprint-conflict {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 42px;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid var(--studio-line);
+  color: var(--studio-muted);
+  background: var(--studio-panel-raised);
+}
+
+.blueprint-status svg,
+.blueprint-conflict > svg {
+  flex: none;
+  color: var(--studio-teal);
+}
+
+.blueprint-conflict {
+  color: var(--studio-text);
+  background: color-mix(in srgb, var(--red-500) 9%, var(--studio-panel));
+}
+
+.blueprint-conflict p {
+  margin: 0.2rem 0 0;
+  color: var(--studio-muted);
+}
+
+.blueprint-conflict .button {
+  margin-left: auto;
+}
+
+.blueprint-suggestions,
+.blueprint-annotation-strip {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--studio-line);
+  background: var(--studio-panel);
+}
+
+.blueprint-suggestions > header,
+.blueprint-suggestions article,
+.blueprint-annotation-strip article {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.blueprint-suggestions > header span,
+.blueprint-suggestions article span,
+.blueprint-annotation-strip span {
+  display: block;
+  color: var(--studio-muted);
+  font-size: 0.72rem;
+}
+
+.blueprint-suggestions article {
+  padding: 0.6rem;
+  border: 1px dashed var(--studio-teal);
+  background: color-mix(in srgb, var(--studio-teal) 5%, transparent);
+}
+
+.blueprint-suggestions article > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.blueprint-annotation-strip {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.blueprint-annotation-strip article {
+  align-items: flex-start;
+  padding: 0.55rem;
+  border: 1px solid var(--studio-line);
+  background: var(--studio-panel-raised);
+}
+
+.blueprint-canvas-shell {
+  position: relative;
+  height: clamp(520px, 66svh, 760px);
+  min-height: 520px;
+  background:
+    linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--studio-teal) 10%, transparent) 1px,
+        transparent 1px
+      )
+      0 0 / 24px 24px,
+    linear-gradient(color-mix(in srgb, var(--studio-teal) 10%, transparent) 1px, transparent 1px) 0
+      0 / 24px 24px,
+    color-mix(in srgb, var(--studio-rail) 94%, black);
+}
+
+.blueprint-canvas-shell .react-flow {
+  color: var(--cream-50);
+}
+
+.blueprint-canvas-shell .react-flow__edge-path {
+  stroke: var(--studio-brass);
+  stroke-width: 2;
+}
+
+.blueprint-canvas-shell .react-flow__edge[data-testid*="evolves"] .react-flow__edge-path {
+  stroke-width: 3;
+}
+
+.blueprint-canvas-shell .react-flow__controls,
+.blueprint-canvas-shell .react-flow__minimap {
+  overflow: hidden;
+  border: 1px solid #666f6b;
+  border-radius: 1px;
+  background: #181c1a;
+}
+
+.blueprint-canvas-shell .react-flow__controls-button {
+  border-bottom-color: #4d5652;
+  color: var(--cream-50);
+  background: #232826;
+  fill: currentColor;
+}
+
+.blueprint-node {
+  position: relative;
+  display: grid;
+  min-width: 210px;
+  min-height: 104px;
+  align-content: center;
+  gap: 0.35rem;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--blueprint-node-color, var(--studio-brass));
+  color: var(--cream-50);
+  background: linear-gradient(145deg, #252a28, #151817);
+  box-shadow:
+    0 9px 22px rgb(0 0 0 / 35%),
+    inset 0 0 0 2px rgb(255 255 255 / 4%);
+}
+
+.blueprint-node::before {
+  position: absolute;
+  inset: 4px;
+  border: 1px solid color-mix(in srgb, var(--blueprint-node-color) 40%, transparent);
+  content: "";
+  pointer-events: none;
+}
+
+.blueprint-node[data-selected="true"] {
+  outline: 3px solid var(--brass-300);
+  outline-offset: 3px;
+}
+
+.blueprint-node-worker {
+  --blueprint-node-color: var(--blueprint-worker);
+}
+.blueprint-node-capability {
+  --blueprint-node-color: var(--blueprint-capability);
+}
+.blueprint-node-job {
+  --blueprint-node-color: var(--blueprint-job);
+}
+.blueprint-node-worksite {
+  --blueprint-node-color: var(--blueprint-worksite);
+}
+.blueprint-node-interlock {
+  --blueprint-node-color: var(--blueprint-interlock);
+}
+.blueprint-node-result {
+  --blueprint-node-color: var(--blueprint-result);
+}
+
+.blueprint-node header {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--blueprint-node-color);
+  font: 800 0.62rem/1.2 var(--font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.blueprint-node > strong {
+  position: relative;
+  z-index: 1;
+  font-size: 0.95rem;
+}
+
+.blueprint-node-dex {
+  position: absolute;
+  top: 0.7rem;
+  right: 0.7rem;
+  color: var(--cream-200);
+  font: 800 0.68rem/1 var(--font-mono);
+}
+
+.blueprint-node-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.blueprint-node-meta span {
+  padding: 0.16rem 0.32rem;
+  border: 1px solid #4d5652;
+  color: var(--andesite-300);
+  font: 700 0.55rem/1.1 var(--font-mono);
+  text-transform: uppercase;
+}
+
+.blueprint-port {
+  width: 14px !important;
+  height: 14px !important;
+  border: 2px solid #121413 !important;
+  border-radius: 2px !important;
+  background: var(--studio-brass) !important;
+}
+
+.blueprint-port-capability {
+  background: var(--blueprint-capability) !important;
+}
+.blueprint-port-job {
+  background: var(--blueprint-job) !important;
+}
+.blueprint-port-worksite {
+  background: var(--blueprint-worksite) !important;
+}
+.blueprint-port-interlock {
+  background: var(--blueprint-interlock) !important;
+}
+.blueprint-port-result {
+  background: var(--blueprint-result) !important;
+}
+.blueprint-port-evolution {
+  width: 16px !important;
+  height: 16px !important;
+  transform: rotate(45deg) translate(-50%, -50%) !important;
+  background: var(--blueprint-worker) !important;
+}
+.blueprint-port-offset-left {
+  left: 32% !important;
+}
+.blueprint-port-offset-right {
+  left: 68% !important;
+}
+.blueprint-port-offset-top {
+  top: 28% !important;
+}
+.blueprint-port-offset-bottom {
+  top: 72% !important;
+}
+
+.blueprint-context-menu,
+.blueprint-selection-inspector {
+  position: fixed;
+  z-index: 130;
+  width: min(320px, calc(100vw - 2rem));
+  max-height: min(620px, calc(100svh - 2rem));
+  overflow: auto;
+  padding: 0.85rem;
+  border: var(--studio-frame-panel-size) solid var(--studio-line);
+  border-image-source: var(--frame-panel-steel-image);
+  border-image-slice: var(--frame-panel-slice);
+  border-image-repeat: round;
+  color: var(--studio-rail-text);
+  background: var(--studio-rail);
+  box-shadow: 0 18px 45px rgb(0 0 0 / 48%);
+}
+
+.blueprint-context-menu > header button,
+.blueprint-selection-inspector > header button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--studio-rail-line);
+  color: inherit;
+  background: transparent;
+}
+
+.blueprint-library-results,
+.blueprint-context-actions {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+}
+
+.blueprint-library-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.blueprint-library-filters button {
+  min-height: 36px;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--studio-rail-line);
+  color: var(--studio-rail-muted);
+  background: var(--studio-rail-raised);
+}
+
+.blueprint-library-filters button[aria-pressed="true"] {
+  border-color: var(--studio-brass);
+  color: var(--studio-rail-text);
+}
+
+.blueprint-library-results button,
+.blueprint-context-actions button {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem;
+  border: 1px solid var(--studio-rail-line);
+  color: var(--studio-rail-text);
+  text-align: left;
+  background: var(--studio-rail-raised);
+  cursor: pointer;
+}
+
+.blueprint-library-results span,
+.blueprint-library-results small {
+  display: block;
+}
+
+.blueprint-library-results small {
+  color: var(--studio-rail-muted);
+}
+
+.blueprint-selection-inspector {
+  top: calc(var(--studio-toolbar-height) + 1rem);
+  right: calc(330px + 1.5rem);
+}
+
+.studio-shell[data-right-collapsed="true"] .blueprint-selection-inspector {
+  right: 1.5rem;
+}
+
+.blueprint-selection-inspector code {
+  display: block;
+  margin: 0.6rem 0;
+  overflow-wrap: anywhere;
+  color: var(--studio-teal);
+  font-size: 0.65rem;
+}
+
+.blueprint-outline {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  min-height: 500px;
+  padding: 1rem;
+  background: var(--studio-canvas);
+}
+
+.blueprint-outline section {
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid var(--studio-line);
+  background: var(--studio-panel);
+}
+
+.blueprint-outline-builder {
+  grid-column: 1 / -1;
+}
+
+.blueprint-outline-builder > p {
+  color: var(--studio-muted);
+}
+
+.blueprint-outline-library {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin-block: 0.6rem !important;
+}
+
+.blueprint-outline-connection {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  align-items: end;
+  gap: 0.55rem;
+}
+
+.blueprint-outline ul,
+.blueprint-outline ol {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.blueprint-outline li > button {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.55rem;
+  border: 1px solid var(--studio-line);
+  color: var(--studio-text);
+  text-align: left;
+  background: var(--studio-panel-raised);
+}
+
+.blueprint-outline li > button span,
+.blueprint-outline li > button small {
+  display: block;
+}
+
+.blueprint-outline li > button small {
+  color: var(--studio-muted);
+}
+
+.blueprint-outline li[data-outdated="true"] > button {
+  border-color: var(--red-500);
+}
+
+.blueprint-outline li > label {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.35rem;
+  color: var(--studio-muted);
+  font-size: 0.68rem;
+}
+
+.blueprint-outline select {
+  min-height: 42px;
+  border: 1px solid var(--studio-line);
+  color: var(--studio-text);
+  background: var(--studio-input);
+}
+
+.blueprint-validation {
+  border-top: 1px solid var(--studio-line);
+  background: var(--studio-panel);
+}
+
+.blueprint-validation > button {
+  display: grid;
+  width: 100%;
+  min-height: 52px;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1rem;
+  border: 0;
+  color: var(--studio-text);
+  text-align: left;
+  background: transparent;
+}
+
+.blueprint-validation > button span {
+  justify-self: end;
+  color: var(--studio-muted);
+}
+
+.blueprint-validation ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0.7rem 1rem 1rem;
+  list-style: none;
+}
+
+.blueprint-validation li button {
+  display: grid;
+  width: 100%;
+  gap: 0.2rem;
+  padding: 0.6rem;
+  border: 1px solid var(--studio-line);
+  color: var(--studio-text);
+  text-align: left;
+  background: var(--studio-panel-raised);
+}
+
+.blueprint-validation li[data-severity="error"] button {
+  border-color: var(--red-500);
+}
+
+.blueprint-validation > p {
+  margin: 0;
+  padding: 0 1rem 1rem;
+  color: var(--studio-muted);
+}
+
+.blueprint-loading {
+  display: grid;
+  min-height: 420px;
+  place-content: center;
+  justify-items: center;
+  gap: 0.6rem;
+  color: var(--studio-muted);
+}
+
+@media (max-width: 1180px) {
+  .overview-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .blueprint-toolbar {
+    grid-template-columns: 1fr auto;
+  }
+  .blueprint-selection-inspector {
+    right: 1.5rem;
+  }
+}
+
+@media (max-width: 760px) {
+  .evolution-record-header {
+    grid-template-columns: auto 1fr;
+    min-height: 104px;
+    padding: 0.75rem 1rem;
+  }
+  .evolution-record-header .worker-record-token {
+    width: 64px;
+  }
+  .evolution-record-header > .registry-id {
+    grid-column: 1 / -1;
+  }
+  .pokemon-workspace-tabs {
+    top: var(--studio-toolbar-height);
+    padding: 0 0.35rem;
+  }
+  .pokemon-workspace-tabs button {
+    min-height: 52px;
+    padding-inline: 0.7rem;
+  }
+  .pokemon-overview,
+  .pokemon-facts,
+  .pokemon-discussion {
+    padding: 0.75rem 0.65rem 1.5rem;
+  }
+  .evolution-ribbon > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .evolution-ribbon > header span {
+    text-align: left;
+  }
+  .evolution-ribbon ol {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .evolution-ribbon-connector {
+    top: -0.7rem;
+    left: 50%;
+    transform: rotate(90deg);
+  }
+  .overview-metrics,
+  .overview-card-grid,
+  .fact-editor-grid,
+  .discussion-grid,
+  .blueprint-outline {
+    grid-template-columns: 1fr;
+  }
+  .blueprint-toolbar {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+  .blueprint-mode-toggle,
+  .blueprint-actions {
+    grid-column: auto;
+    flex-wrap: wrap;
+    justify-content: stretch;
+  }
+  .blueprint-outline-connection {
+    grid-template-columns: 1fr;
+  }
+  .blueprint-suggestions article {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .blueprint-mode-toggle .button,
+  .blueprint-actions .button {
+    flex: 1;
+  }
+  .blueprint-canvas-shell {
+    height: 66svh;
+    min-height: 460px;
+  }
+  .blueprint-selection-inspector,
+  .blueprint-context-menu {
+    top: auto !important;
+    right: 0.5rem !important;
+    bottom: 0.5rem;
+    left: 0.5rem !important;
+    width: auto;
+    max-height: 70svh;
+  }
+}
+
+@media (forced-colors: active) {
+  .evolution-ribbon,
+  .overview-card,
+  .overview-metrics article,
+  .pokemon-facts .section-intro,
+  .kinetic-blueprint,
+  .blueprint-context-menu,
+  .blueprint-selection-inspector {
+    border-image-source: none !important;
+    border-color: CanvasText;
+    box-shadow: none;
+  }
+  .blueprint-node {
+    border-color: CanvasText;
+    color: CanvasText;
+    background: Canvas;
+  }
+  .blueprint-node::before {
+    display: none;
+  }
+  .blueprint-port {
+    border-color: CanvasText !important;
+    background: CanvasText !important;
   }
 }

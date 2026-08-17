@@ -8,7 +8,19 @@ import { PublicationReconciler } from "@/features/studio/publication-reconciler"
 
 export const dynamic = "force-dynamic";
 
-const publicationKinds = ["pokemon_species", "job", "machine", "work_profile"] as const;
+const publicationKinds = [
+  "pokemon_species",
+  "pokemon_form",
+  "job",
+  "machine",
+  "registry_entry",
+  "work_profile",
+  "capability",
+  "work_target",
+  "condition",
+  "result",
+  "relationship",
+] as const;
 
 export default async function PublicationsPage({
   searchParams,

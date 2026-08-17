@@ -22,10 +22,12 @@
   },
   "dependencies": {
     "@cobblemon-kinetics/domain": "workspace:*",
+    "@dagrejs/dagre": "3.1.1",
     "@phosphor-icons/react": "2.1.10",
     "@supabase/ssr": "0.12.4",
     "@supabase/supabase-js": "2.112.3",
     "@tailwindcss/postcss": "4.3.3",
+    "@xyflow/react": "12.11.3",
     "ajv": "8.20.0",
     "ajv-formats": "3.0.1",
     "next": "16.3.1",

@@ -1,11 +1,15 @@
 import type {
+  FamilyBlueprint,
+  PokemonWorkspaceData,
   StudioAssignee,
   StudioComment,
+  StudioObject,
   StudioRecord,
   StudioRecordDetail,
   StudioRecordFilters,
   StudioWorkItemLink,
 } from "./studio-types";
+import { evolutionPositionForDex } from "./gen1-evolution";
 import { gen1CurrentTypesByDex } from "./gen1-types";
 
 const names = [
@@ -195,6 +199,15 @@ function recordFor(name: string, index: number): StudioRecord {
   const types = typeFor(nationalDex);
   const originalTypes = originalTypeFor(nationalDex, types);
   const squirtle = nationalDex === 7;
+  const evolution = evolutionPositionForDex(nationalDex);
+  const familyNames = evolution.members.map((dex) => names[dex - 1]!);
+  const evolutionFamily =
+    nationalDex === 106 || nationalDex === 107
+      ? "Hitmonlee / Hitmonchan"
+      : nationalDex >= 133 && nationalDex <= 136
+        ? "Eevee → Vaporeon / Jolteon / Flareon"
+        : familyNames.join(" → ");
+  const bulbasaurLine = nationalDex >= 1 && nationalDex <= 3;
   return {
     publicId: `cobblemon_kinetics:pokemon/${slug}`,
     slug,
@@ -218,6 +231,15 @@ function recordFor(name: string, index: number): StudioRecord {
       current_typing: types.join(" / "),
       original_gen1_typing: originalTypes.join(" / "),
       base_friendship: 70,
+      genus: bulbasaurLine ? "Seed Pokémon" : "",
+      habitat: bulbasaurLine ? "grassland" : "",
+      growth_rate: bulbasaurLine ? "medium-slow" : "",
+      shape: bulbasaurLine ? "quadruped" : "",
+      color: bulbasaurLine ? "green" : "",
+      primary_type: types[0] ?? "normal",
+      secondary_type: types[1] ?? "",
+      evolution_family: evolutionFamily,
+      evolution_stage: evolution.stageLabel,
       source: "Fixture data only",
     },
     design: {},
@@ -499,6 +521,7 @@ export function resetFixtureStudioState(): void {
   fixtureOverrides.clear();
   fixtureComments.clear();
   fixtureHistories.clear();
+  fixtureBlueprintOverrides.clear();
 }
 
 export function fixtureRecordDetail(publicId: string): StudioRecordDetail | null {
@@ -534,18 +557,415 @@ export function fixtureRecordDetail(publicId: string): StudioRecordDetail | null
     revisions: cloneRecord(fixtureHistories.get(record.publicId) ?? defaultHistory(record)),
     comments: cloneRecord(fixtureComments.get(record.publicId) ?? []),
     workItems: task ? [task] : [],
-    provenance: [
-      {
-        fieldPath: "facts",
-        sourceSheet: "Fixture",
-        sourceRow: record.nationalDex ?? 0,
-        sourceKey: record.slug,
-        importedValue: record.facts,
-        importedHash: record.checksum,
-        overriddenAt: null,
-      },
-    ],
+    provenance: Object.entries(record.facts).map(([field, value]) => ({
+      fieldPath: `facts.${field}`,
+      sourceSheet: "Fixture",
+      sourceRow: record.nationalDex ?? 0,
+      sourceKey: record.slug,
+      importedValue: value,
+      importedHash: record.checksum,
+      overriddenAt: null,
+    })),
   };
+}
+
+const controlledValues: PokemonWorkspaceData["controlledValues"] = {
+  growth_rate: [
+    { slug: "fast", label: "Fast", reviewRequired: false },
+    { slug: "medium", label: "Medium", reviewRequired: false },
+    { slug: "medium-slow", label: "Medium Slow", reviewRequired: false },
+    { slug: "slow", label: "Slow", reviewRequired: false },
+  ],
+  habitat: [
+    "Cave",
+    "Forest",
+    "Grassland",
+    "Mountain",
+    "Rare",
+    "Rough Terrain",
+    "Sea",
+    "Urban",
+    "Waters Edge",
+  ].map((label) => ({
+    slug: label.toLowerCase().replaceAll(" ", "-"),
+    label,
+    reviewRequired: false,
+  })),
+  shape: [
+    "Armor",
+    "Arms",
+    "Ball",
+    "Blob",
+    "Bug Wings",
+    "Fish",
+    "Heads",
+    "Humanoid",
+    "Legs",
+    "Quadruped",
+    "Squiggle",
+    "Tentacles",
+    "Upright",
+    "Wings",
+  ].map((label) => ({
+    slug: label.toLowerCase().replaceAll(" ", "-"),
+    label,
+    reviewRequired: false,
+  })),
+  color: [
+    "Black",
+    "Blue",
+    "Brown",
+    "Gray",
+    "Green",
+    "Pink",
+    "Purple",
+    "Red",
+    "White",
+    "Yellow",
+  ].map((label) => ({ slug: label.toLowerCase(), label, reviewRequired: false })),
+  pokemon_type: fixtureTypes.map((type) => ({
+    slug: type,
+    label: `${type[0]?.toUpperCase()}${type.slice(1)}`,
+    reviewRequired: false,
+  })),
+  genus: [
+    { slug: "seed-pokemon", label: "Seed Pokémon", reviewRequired: false },
+    { slug: "tiny-turtle-pokemon", label: "Tiny Turtle Pokémon", reviewRequired: false },
+  ],
+};
+
+function familyForRecord(record: StudioRecord) {
+  const dex = record.nationalDex ?? 1;
+  const evolution = evolutionPositionForDex(dex);
+  const root = currentFixtureRecord(
+    `cobblemon_kinetics:pokemon/${slugFor(names[evolution.members[0]! - 1]!)}`,
+  )!;
+  return {
+    publicId: `cobblemon_kinetics:evolution-family/${root.slug}`,
+    displayName: `${root.displayName} family`,
+    boardPublicId: `cobblemon_kinetics:blueprint/${root.slug}`,
+    stage: { index: evolution.stageIndex, label: evolution.stageLabel },
+    members: evolution.members.map((memberDex) => {
+      const member = currentFixtureRecord(
+        `cobblemon_kinetics:pokemon/${slugFor(names[memberDex - 1]!)}`,
+      )!;
+      const position = evolutionPositionForDex(memberDex);
+      return {
+        publicId: member.publicId,
+        formPublicId: `${member.publicId}/default`,
+        displayName: member.displayName,
+        nationalDex: memberDex,
+        stageIndex: position.stageIndex,
+        stageLabel: position.stageLabel,
+      };
+    }),
+  } satisfies PokemonWorkspaceData["family"];
+}
+
+export function fixturePokemonWorkspace(publicIdOrSlug: string): PokemonWorkspaceData | null {
+  const detail = fixtureRecordDetail(publicIdOrSlug);
+  if (!detail || detail.recordKind !== "pokemon_species") return null;
+  const dex = detail.nationalDex ?? 0;
+  const capabilityTier = dex >= 1 && dex <= 3 ? (dex as 1 | 2 | 3) : null;
+  const family = familyForRecord(detail);
+  const formPublicId = `${detail.publicId}/default`;
+  const acceptedEdge = fixtureFamilyBlueprint(family.publicId)?.edges.find(
+    (edge) =>
+      edge.source === formPublicId &&
+      edge.target === "cobblemon_kinetics:capability/plant-care" &&
+      edge.relationshipKind === "has_capability",
+  );
+  const acceptedTier =
+    capabilityTier ??
+    (acceptedEdge ? (Number(acceptedEdge.metadata.tier ?? 1) as 1 | 2 | 3 | 4) : null);
+  return {
+    ...detail,
+    family,
+    controlledValues,
+    capabilities: acceptedTier
+      ? [
+          {
+            relationshipPublicId:
+              acceptedEdge?.id ??
+              `cobblemon_kinetics:relationship/fixture-${detail.slug}-plant-care`,
+            capabilityPublicId: "cobblemon_kinetics:capability/plant-care",
+            name: "Plant Care",
+            tier: acceptedTier,
+            tierLabel: ["Basic", "Capable", "Advanced", "Exceptional"][acceptedTier - 1] as
+              "Basic" | "Capable" | "Advanced" | "Exceptional",
+            inheritanceDecision:
+              acceptedEdge?.inheritanceDecision ?? (acceptedTier === 1 ? "add" : "raise"),
+            inheritanceState: "current",
+            explicitValues: {
+              radius: Number(acceptedEdge?.metadata.radius ?? [2, 4, 6, 8][acceptedTier - 1]),
+              speed_modifier: acceptedTier === 3 ? 0.85 : 1,
+            },
+          },
+        ]
+      : [],
+    typeSuggestions: detail.types.includes("grass")
+      ? [
+          {
+            id: "00000000-0000-4000-8000-00000000a001",
+            capabilityPublicId: "cobblemon_kinetics:capability/plant-care",
+            name: "Plant Care",
+            suggestedTier: 1,
+            rationale: "Grass Workshop suggestion only; accepting it creates an explicit draft.",
+            accepted: acceptedTier !== null,
+          },
+        ]
+      : [],
+    preferredView: "overview",
+  };
+}
+
+function blueprintRelationship(
+  id: string,
+  relationshipKind: FamilyBlueprint["edges"][number]["relationshipKind"],
+  source: string,
+  target: string,
+  label: string,
+  metadata: StudioObject = {},
+  inheritanceDecision: FamilyBlueprint["edges"][number]["inheritanceDecision"] = null,
+): FamilyBlueprint["edges"][number] {
+  const handles: Record<FamilyBlueprint["edges"][number]["relationshipKind"], [string, string]> = {
+    has_capability: ["worker:capability", "capability:worker"],
+    requires_capability: ["job:requirement", "capability:job"],
+    assigned_to_job: ["worker:job", "job:worker"],
+    operates_at: ["job:worksite", "worksite:job"],
+    constrained_by: ["rule:condition", "interlock:rule"],
+    produces_result: ["job:result", "result:job"],
+    evolves_to: ["worker:evolution", "worker:evolution"],
+  };
+  return {
+    id,
+    relationshipKind,
+    source,
+    target,
+    sourceHandle: handles[relationshipKind][0],
+    targetHandle: handles[relationshipKind][1],
+    label,
+    metadata,
+    inheritanceDecision,
+    inheritanceState: inheritanceDecision ? "current" : "not_applicable",
+    workflowState: "draft",
+    recordRevision: 1,
+  };
+}
+
+const fixtureBlueprintOverrides = new Map<string, FamilyBlueprint>();
+
+export function fixtureFamilyBlueprint(familyPublicId: string): FamilyBlueprint | null {
+  const existing = fixtureBlueprintOverrides.get(familyPublicId);
+  if (existing) return cloneRecord(existing);
+  const rootSlug = familyPublicId.split("/").at(-1);
+  const root = currentFixtureRecords().find((record) => record.slug === rootSlug);
+  if (!root?.nationalDex) return null;
+  const evolution = evolutionPositionForDex(root.nationalDex);
+  const members = evolution.members.map((dex) => currentFixtureRecord(slugFor(names[dex - 1]!))!);
+  const nodes: FamilyBlueprint["nodes"] = members.map((member) => {
+    const position = evolutionPositionForDex(member.nationalDex!);
+    const branch = evolution.members
+      .filter((dex) => evolutionPositionForDex(dex).stageIndex === position.stageIndex)
+      .indexOf(member.nationalDex!);
+    return {
+      id: `${member.publicId}/default`,
+      recordKind: "pokemon_form",
+      nodeFamily: "worker",
+      displayName: member.displayName,
+      workflowState: member.workflowState,
+      recordRevision: member.revision,
+      position: { x: 60 + (position.stageIndex - 1) * 320, y: 70 + branch * 190 },
+      width: 250,
+      height: 136,
+      groupKey: null,
+      collapsed: false,
+      nationalDex: member.nationalDex,
+      types: member.types,
+      data: { stage_label: position.stageLabel },
+    };
+  });
+  const edges = evolution.edges.map(([from, to]) =>
+    blueprintRelationship(
+      `cobblemon_kinetics:relationship/fixture-evolves-${from}-${to}`,
+      "evolves_to",
+      `${currentFixtureRecord(slugFor(names[from - 1]!))!.publicId}/default`,
+      `${currentFixtureRecord(slugFor(names[to - 1]!))!.publicId}/default`,
+      "Evolves to",
+    ),
+  );
+  if (root.nationalDex === 1) {
+    const sharedNodes: FamilyBlueprint["nodes"] = [
+      [
+        "cobblemon_kinetics:capability/plant-care",
+        "capability",
+        "capability",
+        "Plant Care",
+        380,
+        360,
+      ],
+      ["cobblemon_kinetics:job/plant-tender", "job", "job", "Plant Tender", 680, 360],
+      [
+        "cobblemon_kinetics:work-target/ordinary-farmland",
+        "work_target",
+        "worksite",
+        "Ordinary Farmland",
+        980,
+        260,
+      ],
+      [
+        "cobblemon_kinetics:condition/owner-permission",
+        "condition",
+        "interlock",
+        "Owner Permission",
+        980,
+        430,
+      ],
+      ["cobblemon_kinetics:result/tended-crops", "result", "result", "Tended Crops", 1280, 340],
+    ].map(([id, recordKind, nodeFamily, displayName, x, y]) => ({
+      id: String(id),
+      recordKind: recordKind as StudioRecord["recordKind"],
+      nodeFamily: nodeFamily as FamilyBlueprint["nodes"][number]["nodeFamily"],
+      displayName: String(displayName),
+      workflowState: "draft",
+      recordRevision: 1,
+      position: { x: Number(x), y: Number(y) },
+      width: 220,
+      height: 116,
+      groupKey: null,
+      collapsed: false,
+      nationalDex: null,
+      types: [],
+      data: {},
+    }));
+    nodes.push(...sharedNodes);
+    let parentCapability: string | null = null;
+    let parentJob: string | null = null;
+    for (const [index, member] of members.entries()) {
+      const workerId = `${member.publicId}/default`;
+      const tier = (index + 1) as 1 | 2 | 3;
+      const capabilityId = `cobblemon_kinetics:relationship/fixture-${member.slug}-plant-care`;
+      edges.push(
+        blueprintRelationship(
+          capabilityId,
+          "has_capability",
+          workerId,
+          "cobblemon_kinetics:capability/plant-care",
+          `Plant Care · Tier ${tier}`,
+          { tier, radius: [2, 4, 6][index]!, speed_modifier: tier === 3 ? 0.85 : 1 },
+          tier === 1 ? "add" : "raise",
+        ),
+      );
+      const jobId = `cobblemon_kinetics:relationship/fixture-${member.slug}-plant-tender`;
+      edges.push(
+        blueprintRelationship(
+          jobId,
+          "assigned_to_job",
+          workerId,
+          "cobblemon_kinetics:job/plant-tender",
+          "Candidate job",
+          { parent_relationship: parentJob },
+          tier === 1 ? "add" : "keep",
+        ),
+      );
+      parentCapability = capabilityId;
+      parentJob = jobId;
+      void parentCapability;
+    }
+    edges.push(
+      blueprintRelationship(
+        "cobblemon_kinetics:relationship/fixture-job-requires-plant-care",
+        "requires_capability",
+        "cobblemon_kinetics:job/plant-tender",
+        "cobblemon_kinetics:capability/plant-care",
+        "Requires Tier 1",
+        { minimum_tier: 1 },
+      ),
+      blueprintRelationship(
+        "cobblemon_kinetics:relationship/fixture-job-farmland",
+        "operates_at",
+        "cobblemon_kinetics:job/plant-tender",
+        "cobblemon_kinetics:work-target/ordinary-farmland",
+        "Operates at",
+      ),
+      blueprintRelationship(
+        "cobblemon_kinetics:relationship/fixture-job-owner",
+        "constrained_by",
+        "cobblemon_kinetics:job/plant-tender",
+        "cobblemon_kinetics:condition/owner-permission",
+        "Requires permission",
+      ),
+      blueprintRelationship(
+        "cobblemon_kinetics:relationship/fixture-job-result",
+        "produces_result",
+        "cobblemon_kinetics:job/plant-tender",
+        "cobblemon_kinetics:result/tended-crops",
+        "Produces",
+        { bounded: true },
+      ),
+    );
+  }
+  return {
+    board: {
+      publicId: `cobblemon_kinetics:blueprint/${root.slug}`,
+      familyPublicId,
+      revision: 1,
+      checksum: `fixture-blueprint-${root.slug}`.padEnd(64, "0").slice(0, 64),
+    },
+    nodes,
+    edges,
+    annotations: [],
+    preference: {
+      viewport: { x: 0, y: 0, zoom: 1 },
+      filters: {},
+      hiddenNodes: [],
+      lastView: "overview",
+    },
+  };
+}
+
+export function saveFixtureFamilyBlueprint(blueprint: FamilyBlueprint): FamilyBlueprint {
+  const next = cloneRecord({
+    ...blueprint,
+    board: {
+      ...blueprint.board,
+      revision: blueprint.board.revision + 1,
+      checksum: `fixture-blueprint-${blueprint.board.revision + 1}`.padEnd(64, "0").slice(0, 64),
+    },
+  });
+  fixtureBlueprintOverrides.set(next.board.familyPublicId, next);
+  return cloneRecord(next);
+}
+
+export function approveFixtureBlueprintRecord(
+  publicId: string,
+  expectedRevision: number,
+): { publicId: string; revision: number; workflowState: "approved" } | null {
+  const familyIds = new Set(
+    currentFixtureRecords()
+      .filter((record) => record.recordKind === "pokemon_species")
+      .map((record) => familyForRecord(record).publicId),
+  );
+  for (const familyPublicId of familyIds) {
+    const blueprint = fixtureFamilyBlueprint(familyPublicId);
+    if (!blueprint) continue;
+    const node = blueprint.nodes.find((candidate) => candidate.id === publicId);
+    if (node) {
+      if (node.recordRevision !== expectedRevision || node.data.needs_completion === true)
+        return null;
+      node.workflowState = "approved";
+      fixtureBlueprintOverrides.set(familyPublicId, cloneRecord(blueprint));
+      return { publicId, revision: node.recordRevision, workflowState: "approved" };
+    }
+    const edge = blueprint.edges.find((candidate) => candidate.id === publicId);
+    if (edge) {
+      if (edge.recordRevision !== expectedRevision) return null;
+      edge.workflowState = "approved";
+      fixtureBlueprintOverrides.set(familyPublicId, cloneRecord(blueprint));
+      return { publicId, revision: edge.recordRevision, workflowState: "approved" };
+    }
+  }
+  return null;
 }
 
 export function fixtureRecordList(filters: StudioRecordFilters = {}): StudioRecord[] {

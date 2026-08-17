@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import type {
   AssetManifest,
   PublicationBundlePayload,
+  PublicBlueprintRecord,
   PublicNamedRecord,
   PublicPokemon,
   WorkProfile,
@@ -40,6 +41,43 @@ async function sandbox(label: string): Promise<string> {
 
 async function payload(): Promise<PublicationBundlePayload> {
   const collection = await fixture<{ pokemon: PublicPokemon[] }>("pokemon/gen1.json");
+  const formPublicId = collection.pokemon[0]!.form.public_id;
+  const blueprints: PublicBlueprintRecord[] = [
+    {
+      format_version: 1,
+      public_id: formPublicId,
+      record_kind: "pokemon_form",
+      name: "Squirtle",
+      status: "approved",
+      species_public_id: collection.pokemon[0]!.public_id,
+      form_key: "default",
+      aspects: [],
+    },
+    {
+      format_version: 1,
+      public_id: "cobblemon_kinetics:capability/water-flow",
+      record_kind: "capability",
+      name: "Water Flow",
+      status: "approved",
+      category: "fluid_handling",
+      description: "Direct a bounded Water-type flow.",
+      tier_min: 1,
+      tier_max: 4,
+    },
+    {
+      format_version: 1,
+      public_id: "cobblemon_kinetics:relationship/squirtle-water-flow",
+      record_kind: "relationship",
+      name: "Squirtle has Water Flow",
+      status: "approved",
+      source_public_id: formPublicId,
+      target_public_id: "cobblemon_kinetics:capability/water-flow",
+      relationship_kind: "has_capability",
+      metadata: { tier: 1 },
+      inheritance_decision: "add",
+      parent_relationship_public_id: null,
+    },
+  ];
   return {
     bundle_version: 1,
     schema_version: "1.0.0",
@@ -49,6 +87,7 @@ async function payload(): Promise<PublicationBundlePayload> {
       jobs: [await fixture<PublicNamedRecord>("jobs/hydro-operator.json")],
       machines: [await fixture<PublicNamedRecord>("machines/hydro-coupler.json")],
       work_profiles: [await fixture<WorkProfile>("work_profiles/hydro_operator.json")],
+      blueprints,
     },
     asset_manifest: await fixture<AssetManifest>("assets/manifest.json"),
   };
@@ -78,7 +117,31 @@ describe("publication pipeline", () => {
       expect(second).toEqual(first);
       expect(await readFile(resolve(published, "manifest.json"), "utf8")).toBe(firstManifest);
       expect(await verifyPublishedData(published)).toMatchObject({ ok: true, errors: [] });
+      expect(
+        JSON.parse(await readFile(resolve(published, "blueprints/records.json"), "utf8")),
+      ).toMatchObject({ format_version: 1, records: bundle.records.blueprints });
       await expect(readFile(resolve(root, "work_profiles/hydro_operator.json"))).rejects.toThrow();
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects a published Blueprint relationship whose endpoint is absent", async () => {
+    const unsafePayload = await payload();
+    const relationship = unsafePayload.records.blueprints!.find(
+      (record) => record.record_kind === "relationship",
+    );
+    expect(relationship?.record_kind).toBe("relationship");
+    if (!relationship || relationship.record_kind !== "relationship") return;
+    relationship.target_public_id = "cobblemon_kinetics:capability/missing";
+    const root = await sandbox("missing-blueprint-endpoint");
+    try {
+      await expect(
+        applyPublicationBundle(createPublicationBundle(unsafePayload, "test-key"), {
+          publishedRoot: resolve(root, "published"),
+          signingKey: "test-key",
+        }),
+      ).rejects.toThrow(/missing target/u);
     } finally {
       await rm(root, { recursive: true, force: true });
     }

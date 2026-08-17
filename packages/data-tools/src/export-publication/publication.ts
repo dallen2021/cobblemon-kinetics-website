@@ -11,10 +11,12 @@ import {
   validatePublicationBundle,
   validatePublishedManifest,
   validatePublicNamedRecord,
+  validatePublicBlueprintRecord,
   validatePublicPokemon,
   validateWorkProfile,
   type PublicationBundle,
   type PublicationBundlePayload,
+  type PublicBlueprintRecord,
   type ModExportManifest,
   type ModExportManifestFile,
   type PublishedManifest,
@@ -44,7 +46,13 @@ import { repositoryPathIsIgnored, trackedFilesUnder } from "../lib/git-source.js
 export interface PublishedFile {
   path: string;
   sha256: string;
-  kind: "pokemon_collection" | "job" | "machine" | "work_profile" | "asset_manifest";
+  kind:
+    | "pokemon_collection"
+    | "job"
+    | "machine"
+    | "work_profile"
+    | "blueprint_collection"
+    | "asset_manifest";
   record_count: number;
 }
 
@@ -90,6 +98,7 @@ function normalizePublicationPayload(payload: PublicationBundlePayload): Publica
       jobs: sortNamed(payload.records.jobs),
       machines: sortNamed(payload.records.machines),
       work_profiles: sortNamed(payload.records.work_profiles),
+      ...(payload.records.blueprints ? { blueprints: sortNamed(payload.records.blueprints) } : {}),
     },
     asset_manifest: {
       ...payload.asset_manifest,
@@ -335,6 +344,7 @@ function recordRelationshipErrors(records: PublicationBundlePayload["records"]):
     ...records.jobs.map((record) => record.public_id),
     ...records.machines.map((record) => record.public_id),
     ...records.work_profiles.map((record) => record.id),
+    ...(records.blueprints ?? []).map((record) => record.public_id),
   ];
   const duplicateIdentifier = duplicateValue(identifiers);
   if (duplicateIdentifier) errors.push(`Duplicate public identifier: ${duplicateIdentifier}`);
@@ -347,6 +357,7 @@ function recordRelationshipErrors(records: PublicationBundlePayload["records"]):
     ["job output slug", records.jobs.map((record) => record.slug)],
     ["machine output slug", records.machines.map((record) => record.slug)],
     ["work-profile output name", records.work_profiles.map(safeProfileName)],
+    ["Blueprint public identifier", (records.blueprints ?? []).map((record) => record.public_id)],
   ] as const) {
     const duplicate = duplicateValue(values);
     if (duplicate) errors.push(`Duplicate ${label}: ${duplicate}`);
@@ -365,6 +376,38 @@ function recordRelationshipErrors(records: PublicationBundlePayload["records"]):
           `${pokemon.public_id}: machine ${assignment.machine_registry_id} is not supported by ${profile.id}`,
         );
       }
+    }
+  }
+
+  const blueprintRecords = records.blueprints ?? [];
+  const availableEndpoints = new Set([
+    ...records.pokemon.map((record) => record.public_id),
+    ...records.pokemon.map((record) => record.form.public_id),
+    ...records.jobs.map((record) => record.public_id),
+    ...records.machines.map((record) => record.public_id),
+    ...records.work_profiles.map((record) => record.id),
+    ...blueprintRecords.map((record) => record.public_id),
+  ]);
+  const relationshipIds = new Set(
+    blueprintRecords
+      .filter((record) => record.record_kind === "relationship")
+      .map((record) => record.public_id),
+  );
+  for (const record of blueprintRecords) {
+    if (record.record_kind !== "relationship") continue;
+    if (!availableEndpoints.has(record.source_public_id)) {
+      errors.push(`${record.public_id}: missing source ${record.source_public_id}`);
+    }
+    if (!availableEndpoints.has(record.target_public_id)) {
+      errors.push(`${record.public_id}: missing target ${record.target_public_id}`);
+    }
+    if (
+      record.parent_relationship_public_id &&
+      !relationshipIds.has(record.parent_relationship_public_id)
+    ) {
+      errors.push(
+        `${record.public_id}: missing parent relationship ${record.parent_relationship_public_id}`,
+      );
     }
   }
   return errors;
@@ -406,6 +449,12 @@ function validateRecords(bundle: PublicationBundle, assetPolicy?: AssetPolicy): 
   for (const profile of bundle.records.work_profiles) {
     const result = validateWorkProfile(profile);
     if (!result.ok) throw new Error(`${profile.id}: ${formatValidationErrors(result.errors)}`);
+  }
+  for (const blueprintRecord of bundle.records.blueprints ?? []) {
+    const result = validatePublicBlueprintRecord(blueprintRecord);
+    if (!result.ok) {
+      throw new Error(`${blueprintRecord.public_id}: ${formatValidationErrors(result.errors)}`);
+    }
   }
   const assetResult = validateAssetManifest(bundle.asset_manifest);
   if (!assetResult.ok)
@@ -497,6 +546,18 @@ export async function applyPublicationBundle(
         ),
       );
     }
+    if (bundle.records.blueprints) {
+      const blueprints = sortNamed(bundle.records.blueprints);
+      files.push(
+        await writeTrackedJson(
+          publishedRoot,
+          "blueprints/records.json",
+          { format_version: 1, records: blueprints } as unknown as JsonValue,
+          "blueprint_collection",
+          blueprints.length,
+        ),
+      );
+    }
     files.push(
       await writeTrackedJson(
         publishedRoot,
@@ -562,6 +623,8 @@ function pathMatchesKind(entry: PublishedFile): boolean {
       return /^machines\/[a-z0-9]+(?:-[a-z0-9]+)*\.json$/u.test(entry.path);
     case "work_profile":
       return /^work_profiles\/[a-z0-9](?:[a-z0-9_.-]*[a-z0-9])?\.json$/u.test(entry.path);
+    case "blueprint_collection":
+      return entry.path === "blueprints/records.json";
   }
 }
 
@@ -609,6 +672,8 @@ export async function verifyPublishedData(publishedRoot: string): Promise<Verifi
     machines: [],
     work_profiles: [],
   };
+  const reconstructedBlueprints: PublicBlueprintRecord[] = [];
+  let hasBlueprintCollection = false;
   let reconstructedAssets: PublicationBundlePayload["asset_manifest"] | undefined;
   for (const entry of manifest.files) {
     if (entry.path.startsWith("/") || entry.path.split("/").includes("..")) {
@@ -668,6 +733,24 @@ export async function verifyPublishedData(publishedRoot: string): Promise<Verifi
       else reconstructed.work_profiles.push(result.value!);
       if (entry.record_count !== 1)
         errors.push(`${entry.path}: work-profile record count must be one.`);
+    } else if (entry.kind === "blueprint_collection") {
+      const collection = value as { format_version?: unknown; records?: unknown };
+      if (collection.format_version !== 1 || !Array.isArray(collection.records)) {
+        errors.push(`${entry.path}: invalid Blueprint collection wrapper.`);
+      } else {
+        hasBlueprintCollection = true;
+        for (const blueprintRecord of collection.records) {
+          const result = validatePublicBlueprintRecord(blueprintRecord);
+          if (!result.ok) {
+            errors.push(`${entry.path}: ${formatValidationErrors(result.errors)}`);
+          } else {
+            reconstructedBlueprints.push(result.value!);
+          }
+        }
+        if (collection.records.length !== entry.record_count) {
+          errors.push(`${entry.path}: record count differs from manifest.`);
+        }
+      }
     } else if (entry.kind === "asset_manifest") {
       const result = validateAssetManifest(value);
       if (!result.ok) errors.push(`${entry.path}: ${formatValidationErrors(result.errors)}`);
@@ -705,6 +788,7 @@ export async function verifyPublishedData(publishedRoot: string): Promise<Verifi
         jobs: sortNamed(reconstructed.jobs),
         machines: sortNamed(reconstructed.machines),
         work_profiles: sortNamed(reconstructed.work_profiles),
+        ...(hasBlueprintCollection ? { blueprints: sortNamed(reconstructedBlueprints) } : {}),
       },
       asset_manifest: reconstructedAssets,
     };

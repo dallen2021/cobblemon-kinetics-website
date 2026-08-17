@@ -29,9 +29,10 @@ test("edits and approves an exact record without creating a fixture publication"
   await expect(
     page.locator(".revision-list").getByText(`r${currentRevision + 1}`, { exact: true }),
   ).toBeVisible({ timeout: 5_000 });
+  await page.getByRole("tab", { name: "Discussion & History" }).click();
   await page.getByRole("button", { name: /Approve revision \d+/u }).click();
   await expect(page.getByRole("button", { name: "Approved" })).toBeDisabled();
-  await expect(page.getByText(/never enter a publication bundle/u)).toBeVisible();
+  await expect(page.getByText(/never enter public projection bundles/u)).toBeVisible();
 
   await page.goto("/studio/publications");
   await expect(page.getByRole("heading", { name: "Publications" })).toBeVisible();

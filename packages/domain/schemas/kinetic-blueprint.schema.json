@@ -1,0 +1,340 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cobblemonkinetics.dev/schemas/kinetic-blueprint.schema.json",
+  "title": "Kinetic Blueprint Contract",
+  "description": "Private Studio contract for shared family boards, durable relationships, staged operations, validation, and optimistic conflicts.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["board", "nodes", "edges", "annotations", "preference"],
+  "properties": {
+    "board": { "$ref": "#/$defs/board" },
+    "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+    "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" } },
+    "annotations": { "type": "array", "items": { "$ref": "#/$defs/annotation" } },
+    "preference": { "$ref": "#/$defs/preference" },
+    "operations": { "type": "array", "items": { "$ref": "#/$defs/operation" } }
+  },
+  "$defs": {
+    "publicId": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+:[a-z0-9_./-]+$"
+    },
+    "position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number", "minimum": -100000, "maximum": 100000 },
+        "y": { "type": "number", "minimum": -100000, "maximum": 100000 }
+      }
+    },
+    "nodeFamily": {
+      "enum": ["worker", "capability", "job", "worksite", "interlock", "result"]
+    },
+    "relationshipKind": {
+      "enum": [
+        "has_capability",
+        "requires_capability",
+        "assigned_to_job",
+        "operates_at",
+        "constrained_by",
+        "produces_result",
+        "evolves_to"
+      ]
+    },
+    "inheritanceDecision": {
+      "enum": ["keep", "raise", "lower", "replace", "remove", "add"]
+    },
+    "board": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["public_id", "family_public_id", "revision", "checksum"],
+      "properties": {
+        "public_id": { "$ref": "#/$defs/publicId" },
+        "family_public_id": { "$ref": "#/$defs/publicId" },
+        "revision": { "type": "integer", "minimum": 1 },
+        "checksum": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "record_kind",
+        "node_family",
+        "display_name",
+        "workflow_state",
+        "record_revision",
+        "position",
+        "collapsed",
+        "data"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/publicId" },
+        "record_kind": { "type": "string", "minLength": 1 },
+        "node_family": { "$ref": "#/$defs/nodeFamily" },
+        "display_name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "workflow_state": { "enum": ["draft", "in_review", "approved", "archived"] },
+        "record_revision": { "type": "integer", "minimum": 0 },
+        "position": { "$ref": "#/$defs/position" },
+        "width": { "type": ["number", "null"], "minimum": 80, "maximum": 1200 },
+        "height": { "type": ["number", "null"], "minimum": 40, "maximum": 1200 },
+        "group_key": { "type": ["string", "null"] },
+        "collapsed": { "type": "boolean" },
+        "national_dex": { "type": ["integer", "null"], "minimum": 1 },
+        "types": { "type": "array", "items": { "type": "string" }, "maxItems": 2 },
+        "data": { "type": "object" }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "relationship_kind",
+        "source",
+        "target",
+        "source_handle",
+        "target_handle",
+        "label",
+        "metadata",
+        "inheritance_state",
+        "workflow_state",
+        "record_revision"
+      ],
+      "properties": {
+        "id": { "$ref": "#/$defs/publicId" },
+        "relationship_kind": { "$ref": "#/$defs/relationshipKind" },
+        "source": { "$ref": "#/$defs/publicId" },
+        "target": { "$ref": "#/$defs/publicId" },
+        "source_handle": { "type": "string", "minLength": 1 },
+        "target_handle": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "maxLength": 160 },
+        "metadata": { "type": "object" },
+        "inheritance_decision": {
+          "anyOf": [{ "$ref": "#/$defs/inheritanceDecision" }, { "type": "null" }]
+        },
+        "inheritance_state": { "enum": ["not_applicable", "current", "outdated"] },
+        "workflow_state": { "enum": ["draft", "in_review", "approved", "archived"] },
+        "record_revision": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "annotation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "annotation_kind", "body", "position_x", "position_y"],
+      "properties": {
+        "id": { "type": "string", "format": "uuid" },
+        "annotation_kind": { "enum": ["group", "comment"] },
+        "body": { "type": "string", "minLength": 1, "maxLength": 4000 },
+        "position_x": { "type": "number" },
+        "position_y": { "type": "number" }
+      }
+    },
+    "preference": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["viewport", "filters", "hidden_nodes", "last_view"],
+      "properties": {
+        "viewport": {
+          "type": "object",
+          "required": ["x", "y", "zoom"],
+          "properties": {
+            "x": { "type": "number" },
+            "y": { "type": "number" },
+            "zoom": { "type": "number", "minimum": 0.1, "maximum": 4 }
+          }
+        },
+        "filters": { "type": "object" },
+        "hidden_nodes": { "type": "array", "items": { "$ref": "#/$defs/publicId" } },
+        "last_view": { "enum": ["overview", "canvas", "outline", "facts", "discussion"] }
+      }
+    },
+    "operation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "record_public_id"],
+          "properties": {
+            "type": { "const": "add_node" },
+            "record_public_id": { "$ref": "#/$defs/publicId" },
+            "position": { "$ref": "#/$defs/position" },
+            "group_key": { "type": ["string", "null"] }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "record_public_id", "position"],
+          "properties": {
+            "type": { "const": "move_node" },
+            "record_public_id": { "$ref": "#/$defs/publicId" },
+            "position": { "$ref": "#/$defs/position" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "record_public_id"],
+          "properties": {
+            "type": { "const": "remove_node" },
+            "record_public_id": { "$ref": "#/$defs/publicId" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "source_public_id",
+            "target_public_id",
+            "relationship_kind",
+            "metadata"
+          ],
+          "properties": {
+            "type": { "const": "upsert_relationship" },
+            "source_public_id": { "$ref": "#/$defs/publicId" },
+            "target_public_id": { "$ref": "#/$defs/publicId" },
+            "relationship_kind": { "$ref": "#/$defs/relationshipKind" },
+            "metadata": { "type": "object" },
+            "inheritance_decision": { "$ref": "#/$defs/inheritanceDecision" },
+            "parent_relationship_public_id": { "$ref": "#/$defs/publicId" },
+            "source_handle": { "type": "string" },
+            "target_handle": { "type": "string" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "relationship_public_id", "decision", "metadata"],
+          "properties": {
+            "type": { "const": "set_inheritance_decision" },
+            "relationship_public_id": { "$ref": "#/$defs/publicId" },
+            "decision": { "$ref": "#/$defs/inheritanceDecision" },
+            "metadata": { "type": "object" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "record_public_id", "record_kind", "display_name", "position"],
+          "properties": {
+            "type": { "const": "create_stub" },
+            "record_public_id": { "$ref": "#/$defs/publicId" },
+            "record_kind": { "enum": ["capability", "job", "work_target", "condition", "result"] },
+            "display_name": { "type": "string", "minLength": 1, "maxLength": 120 },
+            "description": { "type": "string", "maxLength": 1000 },
+            "position": { "$ref": "#/$defs/position" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "relationship_public_id"],
+          "properties": {
+            "type": { "const": "remove_edge" },
+            "relationship_public_id": { "$ref": "#/$defs/publicId" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "relationship_public_id", "confirmed"],
+          "properties": {
+            "type": { "const": "archive_relationship" },
+            "relationship_public_id": { "$ref": "#/$defs/publicId" },
+            "confirmed": { "const": true }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "annotation_kind", "body", "position"],
+          "properties": {
+            "type": { "const": "add_annotation" },
+            "annotation_kind": { "enum": ["group", "comment"] },
+            "body": { "type": "string", "minLength": 1, "maxLength": 4000 },
+            "position": { "$ref": "#/$defs/position" },
+            "width": { "type": "number", "minimum": 120, "maximum": 2000 },
+            "height": { "type": "number", "minimum": 80, "maximum": 2000 },
+            "group_key": { "type": "string", "maxLength": 100 }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "annotation_id"],
+          "properties": {
+            "type": { "const": "update_annotation" },
+            "annotation_id": { "type": "string", "format": "uuid" },
+            "body": { "type": "string", "minLength": 1, "maxLength": 4000 },
+            "position": { "$ref": "#/$defs/position" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "annotation_id"],
+          "properties": {
+            "type": { "const": "remove_annotation" },
+            "annotation_id": { "type": "string", "format": "uuid" }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type"],
+          "properties": { "type": { "const": "auto_layout" } }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "suggestion_id", "form_public_id"],
+          "properties": {
+            "type": { "const": "accept_type_suggestion" },
+            "suggestion_id": { "type": "string", "format": "uuid" },
+            "form_public_id": { "$ref": "#/$defs/publicId" },
+            "tier": { "type": "integer", "minimum": 1, "maximum": 4 },
+            "position": { "$ref": "#/$defs/position" }
+          }
+        }
+      ]
+    },
+    "finding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "message"],
+      "properties": {
+        "code": { "type": "string", "pattern": "^[a-z][a-z0-9_.-]+$" },
+        "severity": { "enum": ["error", "warning", "info"] },
+        "message": { "type": "string", "minLength": 1 },
+        "record_public_id": { "$ref": "#/$defs/publicId" },
+        "relationship_public_id": { "$ref": "#/$defs/publicId" }
+      }
+    },
+    "conflict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message", "stale_entities"],
+      "properties": {
+        "code": { "const": "blueprint_conflict" },
+        "message": { "type": "string" },
+        "current_board_revision": { "type": "integer", "minimum": 1 },
+        "stale_entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["public_id"],
+            "properties": {
+              "public_id": { "$ref": "#/$defs/publicId" },
+              "expected_revision": { "type": "integer", "minimum": 0 },
+              "current_revision": { "type": ["integer", "null"], "minimum": 0 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

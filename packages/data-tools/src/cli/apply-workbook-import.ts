@@ -129,7 +129,30 @@ async function main(): Promise<void> {
       `Workbook import RPC failed with HTTP ${response.status}. No partial import was committed.`,
     );
   }
-  console.log(safeSummary(body));
+  const reconciliation = await fetch(`${origin}/rest/v1/rpc/reconcile_gen1_evolution_blueprints`, {
+    method: "POST",
+    headers: {
+      apikey: secret,
+      Authorization: `Bearer ${secret}`,
+      "Content-Type": "application/json",
+    },
+    body: "{}",
+    redirect: "error",
+    signal: AbortSignal.timeout(60_000),
+  });
+  const reconciliationBody = (await reconciliation.json().catch(() => null)) as unknown;
+  if (!reconciliation.ok) {
+    throw new Error(
+      `Workbook rows were applied, but evolution reconciliation failed with HTTP ${reconciliation.status}. Re-run the same idempotent command after fixing the migration; imported records were not duplicated.`,
+    );
+  }
+  const counts =
+    reconciliationBody && typeof reconciliationBody === "object"
+      ? (reconciliationBody as Record<string, unknown>)
+      : {};
+  console.log(
+    `${safeSummary(body)} Evolution model: ${String(counts.families ?? "?")} families, ${String(counts.evolution_edges ?? "?")} explicit edges.`,
+  );
 }
 
 main().catch((error: unknown) => {

@@ -1,0 +1,279 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://cobblemonkinetics.dev/schemas/public-blueprint-record.schema.json",
+  "title": "Published Blueprint record",
+  "description": "Public-safe, revision-frozen Kinetic Blueprint entities and relationships.",
+  "oneOf": [
+    { "$ref": "#/$defs/pokemonForm" },
+    { "$ref": "#/$defs/capability" },
+    { "$ref": "#/$defs/workTarget" },
+    { "$ref": "#/$defs/condition" },
+    { "$ref": "#/$defs/result" },
+    { "$ref": "#/$defs/registryEntry" },
+    { "$ref": "#/$defs/relationship" }
+  ],
+  "$defs": {
+    "status": { "enum": ["approved", "deprecated"] },
+    "base": {
+      "type": "object",
+      "required": ["format_version", "public_id", "record_kind", "name", "status"],
+      "properties": {
+        "format_version": { "const": 1 },
+        "public_id": { "$ref": "resource-location.schema.json" },
+        "record_kind": {
+          "enum": [
+            "pokemon_form",
+            "capability",
+            "work_target",
+            "condition",
+            "result",
+            "registry_entry",
+            "relationship"
+          ]
+        },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "status": { "$ref": "#/$defs/status" }
+      }
+    },
+    "pokemonForm": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "format_version",
+            "public_id",
+            "record_kind",
+            "name",
+            "status",
+            "species_public_id",
+            "form_key",
+            "aspects"
+          ],
+          "properties": {
+            "format_version": { "const": 1 },
+            "public_id": { "$ref": "resource-location.schema.json" },
+            "record_kind": { "const": "pokemon_form" },
+            "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+            "status": { "$ref": "#/$defs/status" },
+            "species_public_id": { "$ref": "resource-location.schema.json" },
+            "form_key": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_.-]{0,79}$" },
+            "aspects": {
+              "type": "array",
+              "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_.-]{0,79}$" },
+              "uniqueItems": true,
+              "maxItems": 32
+            }
+          }
+        }
+      ]
+    },
+    "capability": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "format_version",
+            "public_id",
+            "record_kind",
+            "name",
+            "status",
+            "category",
+            "description",
+            "tier_min",
+            "tier_max"
+          ],
+          "properties": {
+            "format_version": { "const": 1 },
+            "public_id": { "$ref": "resource-location.schema.json" },
+            "record_kind": { "const": "capability" },
+            "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+            "status": { "$ref": "#/$defs/status" },
+            "category": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+            "description": { "type": "string", "minLength": 1, "maxLength": 1000 },
+            "tier_min": { "type": "integer", "minimum": 1, "maximum": 4 },
+            "tier_max": { "type": "integer", "minimum": 1, "maximum": 4 }
+          }
+        }
+      ]
+    },
+    "workTarget": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "format_version",
+            "public_id",
+            "record_kind",
+            "name",
+            "status",
+            "target_kind",
+            "description"
+          ],
+          "properties": {
+            "format_version": { "const": 1 },
+            "public_id": { "$ref": "resource-location.schema.json" },
+            "record_kind": { "const": "work_target" },
+            "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+            "status": { "$ref": "#/$defs/status" },
+            "target_kind": {
+              "enum": [
+                "machine",
+                "farmland",
+                "water",
+                "storage",
+                "area",
+                "entity",
+                "world_workflow"
+              ]
+            },
+            "description": { "type": "string", "minLength": 1, "maxLength": 1000 }
+          }
+        }
+      ]
+    },
+    "condition": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "format_version",
+            "public_id",
+            "record_kind",
+            "name",
+            "status",
+            "condition_kind",
+            "description"
+          ],
+          "properties": {
+            "format_version": { "const": 1 },
+            "public_id": { "$ref": "resource-location.schema.json" },
+            "record_kind": { "const": "condition" },
+            "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+            "status": { "$ref": "#/$defs/status" },
+            "condition_kind": {
+              "enum": ["ownership", "loading", "weather", "held_item", "space", "battle", "other"]
+            },
+            "description": { "type": "string", "minLength": 1, "maxLength": 1000 }
+          }
+        }
+      ]
+    },
+    "result": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "format_version",
+            "public_id",
+            "record_kind",
+            "name",
+            "status",
+            "result_kind",
+            "description",
+            "bounds"
+          ],
+          "properties": {
+            "format_version": { "const": 1 },
+            "public_id": { "$ref": "resource-location.schema.json" },
+            "record_kind": { "const": "result" },
+            "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+            "status": { "$ref": "#/$defs/status" },
+            "result_kind": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+            "description": { "type": "string", "minLength": 1, "maxLength": 1000 },
+            "bounds": { "type": "object", "maxProperties": 32 }
+          }
+        }
+      ]
+    },
+    "registryEntry": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "format_version",
+            "public_id",
+            "record_kind",
+            "name",
+            "status",
+            "registry_kind",
+            "resource_location",
+            "source_mod",
+            "lifecycle_state"
+          ],
+          "properties": {
+            "format_version": { "const": 1 },
+            "public_id": { "$ref": "resource-location.schema.json" },
+            "record_kind": { "const": "registry_entry" },
+            "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+            "status": { "$ref": "#/$defs/status" },
+            "registry_kind": { "enum": ["block", "item", "entity", "fluid", "tag"] },
+            "resource_location": { "$ref": "resource-location.schema.json" },
+            "source_mod": { "type": "string", "pattern": "^[a-z0-9_.-]+$" },
+            "lifecycle_state": { "enum": ["candidate", "active", "deprecated", "removed"] }
+          }
+        }
+      ]
+    },
+    "relationship": {
+      "allOf": [
+        { "$ref": "#/$defs/base" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "format_version",
+            "public_id",
+            "record_kind",
+            "name",
+            "status",
+            "source_public_id",
+            "target_public_id",
+            "relationship_kind",
+            "metadata",
+            "inheritance_decision"
+          ],
+          "properties": {
+            "format_version": { "const": 1 },
+            "public_id": { "$ref": "resource-location.schema.json" },
+            "record_kind": { "const": "relationship" },
+            "name": { "type": "string", "minLength": 1, "maxLength": 200 },
+            "status": { "$ref": "#/$defs/status" },
+            "source_public_id": { "$ref": "resource-location.schema.json" },
+            "target_public_id": { "$ref": "resource-location.schema.json" },
+            "relationship_kind": {
+              "enum": [
+                "has_capability",
+                "requires_capability",
+                "assigned_to_job",
+                "operates_at",
+                "constrained_by",
+                "produces_result",
+                "evolves_to"
+              ]
+            },
+            "metadata": { "type": "object", "maxProperties": 64 },
+            "inheritance_decision": {
+              "type": ["string", "null"],
+              "enum": ["keep", "raise", "lower", "replace", "remove", "add", null]
+            },
+            "parent_relationship_public_id": {
+              "anyOf": [{ "$ref": "resource-location.schema.json" }, { "type": "null" }]
+            }
+          }
+        }
+      ]
+    }
+  }
+}

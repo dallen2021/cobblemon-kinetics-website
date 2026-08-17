@@ -5,6 +5,7 @@ import { getCurrentMember } from "@/lib/auth";
 import { getAppBaseUrl } from "@/lib/env";
 import { SiteHeader } from "@/components/site-header";
 import { parseStudioTheme, STUDIO_THEME_COOKIE } from "@/components/studio-preferences";
+import "@xyflow/react/dist/style.css";
 import "./globals.css";
 
 export const metadata: Metadata = {

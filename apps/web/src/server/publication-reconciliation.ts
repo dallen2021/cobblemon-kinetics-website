@@ -185,6 +185,9 @@ function expectedFileCounts(bundle: PublicationBundle): Map<string, number> {
     ...bundle.records.jobs.map((record) => [`jobs/${record.slug}.json`, 1] as const),
     ...bundle.records.machines.map((record) => [`machines/${record.slug}.json`, 1] as const),
     ["pokemon/gen1.json", bundle.records.pokemon.length],
+    ...(bundle.records.blueprints
+      ? ([["blueprints/records.json", bundle.records.blueprints.length] as const] as const)
+      : []),
     ...bundle.records.work_profiles.map((record) => [profilePath(record.id), 1] as const),
   ]);
 }
@@ -202,6 +205,14 @@ function expectedPublishedValues(bundle: PublicationBundle): Map<string, unknown
         pokemon: bundle.records.pokemon,
       },
     ],
+    ...(bundle.records.blueprints
+      ? ([
+          [
+            "blueprints/records.json",
+            { format_version: 1, records: bundle.records.blueprints },
+          ] as const,
+        ] as const)
+      : []),
     ...bundle.records.work_profiles.map((record) => [profilePath(record.id), record] as const),
   ]);
 }

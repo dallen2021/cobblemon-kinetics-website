@@ -23,6 +23,7 @@ export type ResourceLocation = MinecraftResourceLocation;
 export type PokemonType = TypeList[number];
 export type PublicNamedRecord = PublishedNamedRecord;
 export type PublicPokemon = PublishedPokemonRecord;
+export type PublicBlueprintRecord = PublishedBlueprintRecord;
 export type WorkProfile = CobblemonKineticsWorkProfile;
 export type AssetManifestEntry = CobblemonKineticsAssetManifest["assets"][number];
 export type AssetManifest = CobblemonKineticsAssetManifest;

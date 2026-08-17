@@ -11,7 +11,9 @@ import type {
   PublicationBundle,
   PublicNamedRecord,
   PublicPokemon,
+  PublicBlueprintRecord,
   WorkProfile,
+  KineticBlueprintContract,
 } from "./generated/domain.js";
 
 export interface ValidationResult<T> {
@@ -29,6 +31,8 @@ const schemaNames = [
   "publication-bundle.schema.json",
   "published-manifest.schema.json",
   "mod-export-manifest.schema.json",
+  "kinetic-blueprint.schema.json",
+  "public-blueprint-record.schema.json",
 ] as const;
 
 const schemas = schemaNames.map((name) =>
@@ -87,6 +91,14 @@ export const validatePublishedManifest = validator<PublishedManifest>(
 
 export const validateModExportManifest = validator<ModExportManifest>(
   "https://cobblemonkinetics.dev/schemas/mod-export-manifest.schema.json",
+);
+
+export const validateKineticBlueprint = validator<KineticBlueprintContract>(
+  "https://cobblemonkinetics.dev/schemas/kinetic-blueprint.schema.json",
+);
+
+export const validatePublicBlueprintRecord = validator<PublicBlueprintRecord>(
+  "https://cobblemonkinetics.dev/schemas/public-blueprint-record.schema.json",
 );
 
 export function formatValidationErrors(errors: readonly ErrorObject[]): string {
