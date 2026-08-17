@@ -13,10 +13,10 @@ const P0_FRAMES = [
   ["navigation rail", ".studio-sidebar"],
   ["studio toolbar", ".studio-toolbar"],
   ["record inspector", ".editor-inspector"],
-  ["machine option", ".machine-picker label"],
-  ["selected item slot", ".studio-shell .item-slot-active"],
+  ["private notes", ".private-section"],
   ["inspector cards", ".inspector-block"],
   ["publication gate", ".publication-block"],
+  ["Studio action", ".editor-inspector .button-primary"],
 ] as const;
 
 async function openStudio(page: Page): Promise<void> {
@@ -183,18 +183,21 @@ test("frames the mobile navigation and inspector drawers without horizontal over
   await expect(navigation).toBeVisible();
   await expectGeneratedFrame(navigation);
   await expectNoDocumentOverflow(page);
+  await expect(page.locator(".studio-brand-mark")).toHaveCSS("width", "124px");
 
   const mobileHeaderGeometry = await page.evaluate(() => {
     const logo = document.querySelector<HTMLElement>(".studio-brand-mark");
     const brandName = document.querySelector<HTMLElement>(".studio-brand-copy strong");
+    const sectionLabel = document.querySelector<HTMLElement>(".studio-sidebar-heading .eyebrow");
     const arrow = document.querySelector<HTMLElement>(".studio-navigation-toggle");
-    if (!logo || !brandName || !arrow) return null;
+    if (!logo || !brandName || !sectionLabel || !arrow) return null;
     const logoBox = logo.getBoundingClientRect();
-    const brandBox = brandName.getBoundingClientRect();
+    const labelBox = sectionLabel.getBoundingClientRect();
     const arrowBox = arrow.getBoundingClientRect();
     return {
-      arrowBelowBrand: arrowBox.top >= brandBox.bottom,
       logoWidth: logoBox.width,
+      caretAlignedToDevelopmentStudio:
+        Math.abs(labelBox.top + labelBox.height / 2 - (arrowBox.top + arrowBox.height / 2)) <= 2,
       noLogoArrowOverlap:
         logoBox.right <= arrowBox.left ||
         arrowBox.right <= logoBox.left ||
@@ -202,8 +205,8 @@ test("frames the mobile navigation and inspector drawers without horizontal over
         arrowBox.bottom <= logoBox.top,
     };
   });
-  expect(mobileHeaderGeometry?.logoWidth).toBeGreaterThanOrEqual(120);
-  expect(mobileHeaderGeometry?.arrowBelowBrand).toBe(true);
+  expect(mobileHeaderGeometry?.logoWidth).toBeGreaterThanOrEqual(96);
+  expect(mobileHeaderGeometry?.caretAlignedToDevelopmentStudio).toBe(true);
   expect(mobileHeaderGeometry?.noLogoArrowOverlap).toBe(true);
 
   await page.locator(".studio-navigation-toggle").click();

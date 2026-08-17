@@ -35,9 +35,19 @@ const nextConfig: NextConfig = {
   agentRules: false,
   reactStrictMode: true,
   poweredByHeader: false,
+  turbopack: {
+    resolveAlias: development
+      ? {}
+      : {
+          "@/server/local-game-assets": "./src/server/local-game-assets.disabled.ts",
+        },
+  },
   outputFileTracingRoot: path.resolve(process.cwd(), "../.."),
   outputFileTracingIncludes: {
     "/*": ["../../data/published/**/*.json", "../../packages/domain/schemas/*.json"],
+  },
+  outputFileTracingExcludes: {
+    "/*": ["../../.private/**/*"],
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

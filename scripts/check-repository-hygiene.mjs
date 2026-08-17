@@ -11,6 +11,20 @@ const files = execFileSync(
   .filter(Boolean);
 
 const failures = [];
+const approvedPublicRasterFiles = new Set([
+  "apps/web/public/art/generated/empty-workbench.webp",
+  "apps/web/public/art/interface/frames/panel-frame-brass.png",
+  "apps/web/public/art/interface/frames/panel-frame-steel.png",
+  "apps/web/public/art/interface/frames/studio-frame-heavy.png",
+  "apps/web/public/brand/cobblemon-kinetics-emblem.png",
+  "apps/web/public/brand/cobblemon-kinetics-lockup-stacked-dark.png",
+  "apps/web/public/brand/cobblemon-kinetics-lockup-transparent.png",
+  "apps/web/public/brand/cobblemon-kinetics-wordmark.png",
+  "apps/web/src/app/apple-icon.png",
+  "apps/web/src/app/icon.png",
+  "apps/web/src/app/opengraph-image.png",
+  "apps/web/src/app/twitter-image.png",
+]);
 const forbiddenPathPatterns = [
   { pattern: /(^|\/)\.env(?!\.example$)/, reason: "untracked environment file" },
   { pattern: /(^|\/)\.private\//, reason: "private workspace data" },
@@ -62,6 +76,15 @@ for (const file of files) {
 
   if (file.endsWith(".jar")) {
     failures.push(`${file}: JARs belong in the separate mod repository, not this website`);
+  }
+
+  if (
+    /^apps\/web\/(?:public\/|src\/app\/).+\.(?:avif|gif|jpe?g|png|webp)$/iu.test(file) &&
+    !approvedPublicRasterFiles.has(file)
+  ) {
+    failures.push(
+      `${file}: public raster is not present in the reviewed project-art allowlist; third-party game assets must stay under ignored .private`,
+    );
   }
 
   const fileName = basename(file);

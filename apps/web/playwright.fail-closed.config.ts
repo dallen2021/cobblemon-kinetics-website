@@ -1,6 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const baseURL = "http://127.0.0.1:3101";
+const configuredBaseURL = process.env.PLAYWRIGHT_BASE_URL;
+if (configuredBaseURL) {
+  const configuredURL = new URL(configuredBaseURL);
+  const loopbackHosts = new Set(["localhost", "127.0.0.1", "[::1]"]);
+  if (!loopbackHosts.has(configuredURL.hostname)) {
+    throw new Error("PLAYWRIGHT_BASE_URL must use an exact loopback host.");
+  }
+}
+const baseURL = configuredBaseURL ?? "http://127.0.0.1:3101";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -15,17 +23,19 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  webServer: {
-    command: "pnpm dev --port 3101",
-    url: `${baseURL}/auth/sign-in`,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-    env: {
-      APP_BASE_URL: baseURL,
-      SITE_ACCESS_MODE: "private",
-      STUDIO_FIXTURE_MODE: "false",
-      NEXT_PUBLIC_SUPABASE_URL: "",
-      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "",
-    },
-  },
+  webServer: configuredBaseURL
+    ? undefined
+    : {
+        command: "pnpm dev --port 3101",
+        url: `${baseURL}/auth/sign-in`,
+        reuseExistingServer: !process.env.CI,
+        timeout: 120_000,
+        env: {
+          APP_BASE_URL: baseURL,
+          SITE_ACCESS_MODE: "private",
+          STUDIO_FIXTURE_MODE: "false",
+          NEXT_PUBLIC_SUPABASE_URL: "",
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "",
+        },
+      },
 });

@@ -12,42 +12,34 @@ test("browses the Git-published wiki and searches Squirtle", async ({ page }) =>
   await expect(page.getByRole("link", { name: "Squirtle" })).toBeVisible();
 });
 
-test("edits and approves an exact Squirtle revision", async ({ page }) => {
+test("edits and approves an exact record without creating a fixture publication", async ({
+  page,
+}) => {
   await page.goto("/studio/pokemon/squirtle");
   await expect(page.getByText("Safe fixture", { exact: true })).toBeVisible();
+  const revisionLabel = await page.locator(".record-header .eyebrow").textContent();
+  const currentRevision = Number(revisionLabel?.match(/Revision (\d+)/u)?.[1]);
+  expect(currentRevision).toBeGreaterThan(0);
   await page.getByLabel(/Efficiency multiplier/u).fill("1.25");
   await page
     .getByLabel(/Public balance rationale/u)
     .fill(
-      "A 1.25× reviewed test value confirms the approved revision reaches its immutable publication bundle.",
+      `A 1.25× reviewed test value documents a bounded Hydro planning baseline (${Date.now()}).`,
     );
-  await expect(page.getByText(/Revision 13 saved by Fixture maintainer/u)).toBeVisible({
-    timeout: 5_000,
-  });
-  await page.getByRole("button", { name: "Approve revision 13" }).click();
-  await expect(page.getByRole("heading", { name: "Ready for a batch" })).toBeVisible();
-  await expect(page.getByText("Private note").locator("..")).toContainText("Excluded");
-  await page.getByRole("button", { name: "Create immutable publication batch" }).click();
-  const downloadLink = page.getByRole("link", { name: "Download frozen bundle" });
-  await expect(downloadLink).toBeVisible();
-  const [download] = await Promise.all([page.waitForEvent("download"), downloadLink.click()]);
-  const stream = await download.createReadStream();
-  let serialized = "";
-  for await (const chunk of stream) serialized += chunk.toString();
-  const bundle = JSON.parse(serialized) as {
-    records: {
-      pokemon: Array<{
-        work_assignments: Array<{ efficiency_multiplier: number; public_rationale: string }>;
-      }>;
-    };
-  };
-  expect(bundle.records.pokemon[0]?.work_assignments[0]).toMatchObject({
-    efficiency_multiplier: 1.25,
-    public_rationale:
-      "A 1.25× reviewed test value confirms the approved revision reaches its immutable publication bundle.",
-  });
-  expect(serialized).not.toContain("private_note");
-  expect(serialized).not.toContain("actor_id");
+  await expect(
+    page.locator(".revision-list").getByText(`r${currentRevision + 1}`, { exact: true }),
+  ).toBeVisible({ timeout: 5_000 });
+  await page.getByRole("button", { name: /Approve revision \d+/u }).click();
+  await expect(page.getByRole("button", { name: "Approved" })).toBeDisabled();
+  await expect(page.getByText(/never enter a publication bundle/u)).toBeVisible();
+
+  await page.goto("/studio/publications");
+  await expect(page.getByRole("heading", { name: "Publications" })).toBeVisible();
+  await expect(page.getByText("Fixture mode", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(/Fixture mode intentionally proves the user interface only/u),
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: /Create batch/u })).toBeDisabled();
 });
 
 test("passes a keyboard and axe smoke check", async ({ page }) => {

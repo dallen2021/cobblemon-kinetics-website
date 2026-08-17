@@ -1,10 +1,11 @@
+import { ClockCounterClockwise } from "@phosphor-icons/react/ssr";
 import { MaterialPanel, PageHeading } from "@/components/ui";
-import { loadSquirtleDraft } from "@/server/studio-repository";
+import { listStudioAuditEvents } from "@/server/studio-repository";
 
 export const dynamic = "force-dynamic";
 
 export default async function HistoryPage() {
-  const draft = await loadSquirtleDraft();
+  const events = await listStudioAuditEvents();
   return (
     <main className="studio-page">
       <PageHeading
@@ -12,15 +13,18 @@ export default async function HistoryPage() {
         title="Revision history"
         description="Rollback creates a new revision; prior evidence is never rewritten."
       />
-      <MaterialPanel eyebrow="Squirtle" title={`${draft.revisions.length} recent revisions`}>
+      <MaterialPanel eyebrow="All records" title={`${events.length} recent audit events`}>
         <ol className="revision-list history-page-list">
-          {draft.revisions.map((revision) => (
-            <li key={`${revision.revision}:${revision.at}`}>
-              <span>r{revision.revision}</span>
+          {events.map((event) => (
+            <li key={event.id}>
+              <span>
+                <ClockCounterClockwise aria-hidden="true" />{" "}
+                {event.afterRevision ? `r${event.afterRevision}` : "—"}
+              </span>
               <div>
-                <strong>{revision.summary}</strong>
+                <strong>{event.action.replaceAll(".", " ")}</strong>
                 <small>
-                  {revision.actor} · {revision.at.slice(0, 10)}
+                  {event.recordId ?? "Studio"} · {event.createdAt.slice(0, 10)}
                 </small>
               </div>
             </li>

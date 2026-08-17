@@ -1,16 +1,19 @@
-import { ItemSlot } from "@/components/ui";
-import { StudioPlaceholder } from "@/components/studio-placeholder";
+import { notFound } from "next/navigation";
+import { StudioRecordWorkspace } from "@/features/studio/pokemon-workspace";
+import { loadStudioRecord } from "@/server/studio-repository";
+
+export const dynamic = "force-dynamic";
+
+async function loadMachineWorkspace(id: string) {
+  try {
+    return await loadStudioRecord(id);
+  } catch {
+    notFound();
+  }
+}
 
 export default async function StudioMachinePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return (
-    <StudioPlaceholder
-      eyebrow="Machine workspace"
-      title="Registry-backed machine editor"
-      description="Machine-wide research and component editing follow the working Hydro assignment flow."
-      status="Phase 5"
-    >
-      <ItemSlot label="Machine candidate" registryId={decodeURIComponent(id)} />
-    </StudioPlaceholder>
-  );
+  const record = await loadMachineWorkspace((await params).id);
+  if (record.recordKind !== "machine" && record.recordKind !== "machine_research") notFound();
+  return <StudioRecordWorkspace initialRecord={record} />;
 }

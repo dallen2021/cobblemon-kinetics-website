@@ -4,6 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import {
+  ClockCounterClockwise,
+  DownloadSimple,
+  Gear,
+  House,
+  Image as ImageIcon,
+  Kanban,
+  Package,
+  PawPrint,
+  TreeStructure,
+  UsersThree,
+  Wrench,
+} from "@phosphor-icons/react";
 import type { AppMember } from "@/lib/auth";
 import { PanelToggle } from "./panel-toggle";
 import {
@@ -15,15 +28,18 @@ import { ThemeToggle } from "./theme-toggle";
 import { StatusLamp } from "./ui";
 
 const sections = [
-  ["Overview", "/studio"],
-  ["Squirtle", "/studio/pokemon/squirtle"],
-  ["Compatibility", "/studio/compatibility"],
-  ["Workboard", "/studio/workboard"],
-  ["Imports", "/studio/imports"],
-  ["Publications", "/studio/publications"],
-  ["Assets", "/studio/assets"],
-  ["History", "/studio/history"],
-  ["Access", "/studio/settings/access"],
+  { label: "Overview", href: "/studio", icon: House },
+  { label: "Pokémon", href: "/studio/pokemon", icon: PawPrint },
+  { label: "Type Workshop", href: "/studio/types", icon: TreeStructure },
+  { label: "Jobs", href: "/studio/jobs", icon: Wrench },
+  { label: "Machines", href: "/studio/machines", icon: Gear },
+  { label: "Compatibility", href: "/studio/compatibility", icon: TreeStructure },
+  { label: "Workboard", href: "/studio/workboard", icon: Kanban },
+  { label: "Imports", href: "/studio/imports", icon: DownloadSimple },
+  { label: "Publications", href: "/studio/publications", icon: Package },
+  { label: "Assets", href: "/studio/assets", icon: ImageIcon },
+  { label: "History", href: "/studio/history", icon: ClockCounterClockwise },
+  { label: "Access", href: "/studio/settings/access", icon: UsersThree },
 ] as const;
 
 const MOBILE_MEDIA_QUERY = "(max-width: 1100px)";
@@ -72,7 +88,12 @@ export function StudioShell({
   const [rightDrawerOpen, setRightDrawerOpen] = useState(false);
   const leftToggleRef = useRef<HTMLButtonElement>(null);
   const rightToggleRef = useRef<HTMLButtonElement>(null);
-  const hasInspector = pathname.startsWith("/studio/pokemon/");
+  const hasInspector = [
+    "/studio/pokemon/",
+    "/studio/types/",
+    "/studio/jobs/",
+    "/studio/machines/",
+  ].some((prefix) => pathname.startsWith(prefix));
   const leftExpanded = isMobile ? leftDrawerOpen : !leftCollapsed;
   const rightExpanded = hasInspector && (isMobile ? rightDrawerOpen : !rightCollapsed);
 
@@ -170,15 +191,24 @@ export function StudioShell({
           />
         </div>
         <nav aria-label="Studio navigation">
-          {sections.map(([label, href]) => (
+          {sections.map(({ label, href, icon: Icon }) => (
             <Link
-              aria-current={pathname === href ? "page" : undefined}
-              className={pathname === href ? "studio-nav-link-active" : undefined}
+              aria-current={
+                pathname === href || (href !== "/studio" && pathname.startsWith(`${href}/`))
+                  ? "page"
+                  : undefined
+              }
+              className={
+                pathname === href || (href !== "/studio" && pathname.startsWith(`${href}/`))
+                  ? "studio-nav-link-active"
+                  : undefined
+              }
               href={href}
               key={href}
               onClick={() => setLeftDrawerOpen(false)}
             >
-              {label}
+              <Icon aria-hidden="true" weight="bold" />
+              <span>{label}</span>
             </Link>
           ))}
         </nav>

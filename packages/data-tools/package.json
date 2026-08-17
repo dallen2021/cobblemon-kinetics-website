@@ -6,9 +6,11 @@
   "description": "Deterministic import, publication, access, and asset tooling for Cobblemon Kinetics.",
   "bin": {
     "ck-import-workbook": "./dist/cli/import-workbook.js",
+    "ck-apply-workbook-import": "./dist/cli/apply-workbook-import.js",
     "ck-apply-publication": "./dist/cli/apply-publication.js",
     "ck-verify-published": "./dist/cli/verify-published.js",
     "ck-export-mod-work-profiles": "./dist/cli/export-mod-work-profiles.js",
+    "ck-import-local-game-assets": "./dist/cli/import-local-game-assets.js",
     "ck-validate-assets": "./dist/cli/validate-assets.js",
     "ck-access-grant": "./dist/cli/access-grant.js"
   },
@@ -23,9 +25,11 @@
     "typecheck": "pnpm --filter @cobblemon-kinetics/domain build && tsc -p tsconfig.json --noEmit",
     "test": "pnpm --filter @cobblemon-kinetics/domain build && vitest run",
     "import:workbook": "pnpm --filter @cobblemon-kinetics/domain build && tsx src/cli/import-workbook.ts",
+    "apply:workbook-import": "pnpm --filter @cobblemon-kinetics/domain build && tsx src/cli/apply-workbook-import.ts",
     "apply:publication": "pnpm --filter @cobblemon-kinetics/domain build && tsx src/cli/apply-publication.ts",
     "verify:published": "pnpm --filter @cobblemon-kinetics/domain build && tsx src/cli/verify-published.ts",
     "export:mod-work-profiles": "pnpm --filter @cobblemon-kinetics/domain build && tsx src/cli/export-mod-work-profiles.ts",
+    "import:local-game-assets": "pnpm --filter @cobblemon-kinetics/domain build && tsx src/cli/import-local-game-assets.ts",
     "validate:assets": "pnpm --filter @cobblemon-kinetics/domain build && tsx src/cli/validate-assets.ts",
     "access:grant": "pnpm --filter @cobblemon-kinetics/domain build && tsx src/cli/access-grant.ts"
   },
@@ -33,10 +37,14 @@
     "@cobblemon-kinetics/domain": "workspace:*",
     "exceljs": "4.4.0",
     "jszip": "3.10.1",
+    "pngjs": "7.0.0",
+    "yauzl": "3.4.0",
     "yaml": "2.9.0"
   },
   "devDependencies": {
     "@types/node": "26.2.0",
+    "@types/pngjs": "6.0.5",
+    "@types/yauzl": "3.4.0",
     "tsx": "4.23.12",
     "typescript": "6.0.3",
     "vitest": "4.1.10"

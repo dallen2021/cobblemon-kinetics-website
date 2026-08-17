@@ -1,7 +1,6 @@
 import { hasSupabaseEnvironment, isFixtureModeEnabled } from "@/lib/env";
 import { requireMaintainer } from "@/lib/auth";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { getFixturePublicationBundle } from "@/server/fixture-publications";
 import { createSignedPublicationBundleFromRpc } from "@/server/publication-bundle";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -12,10 +11,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
 
   let bundle: unknown;
   if (isFixtureModeEnabled()) {
-    bundle = getFixturePublicationBundle(id);
-    if (!bundle) {
-      return Response.json({ error: "Fixture publication batch was not found." }, { status: 404 });
-    }
+    return Response.json(
+      { error: "Fixture mode never creates or serves publication bundles." },
+      { status: 404 },
+    );
   } else if (hasSupabaseEnvironment()) {
     const signingKey = process.env.PUBLICATION_SIGNING_KEY;
     if (!signingKey) {

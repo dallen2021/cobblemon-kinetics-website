@@ -13,6 +13,10 @@ data toolchain are documented here.
   application-icon variants.
 - Workshop Ledger Studio shell with light/dark themes and collapsible
   navigation and inspector rails.
+- Gen 1 Development Studio Beta: 151 editable Pokémon records, 18 type plans,
+  linked neutral work items, generic record revisions/comments/conflicts, and
+  a controlled transactional workbook importer with private provenance and
+  flavor-text quarantine.
 
 ### Changed
 

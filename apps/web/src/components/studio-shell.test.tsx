@@ -59,7 +59,7 @@ describe("StudioShell", () => {
     const sidebar = screen.getByRole("complementary");
     const heading = container.querySelector(".studio-sidebar-heading");
 
-    expect(screen.getByRole("link", { name: "Squirtle" })).toHaveAttribute("aria-current", "page");
+    expect(screen.getByRole("link", { name: "Pokémon" })).toHaveAttribute("aria-current", "page");
     expect(heading).toContainElement(
       within(sidebar).getByRole("button", { name: "Hide navigation" }),
     );

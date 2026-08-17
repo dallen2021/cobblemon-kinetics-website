@@ -258,7 +258,7 @@ select throws_ok(
       'cobblemon_kinetics:pokemon/squirtle',
       1,
       '20000000-0000-4000-8000-000000000001',
-      '{"efficiency":1.1}'::jsonb
+      '{"balance":{"efficiency":1.1}}'::jsonb
     )
   $$,
   'PGRST',
@@ -301,12 +301,12 @@ select throws_ok(
       'cobblemon_kinetics:pokemon/squirtle',
       1,
       '20000000-0000-4000-8000-000000000012',
-      '{"efficiency":2.01}'::jsonb
+      '{"balance":{"efficiency":4.01}}'::jsonb
     )
   $$,
   'PGRST',
   null,
-  'direct RPC calls cannot bypass balance limits'
+  'direct RPC calls cannot bypass generic balance limits'
 );
 
 select throws_ok(
@@ -315,26 +315,26 @@ select throws_ok(
       'cobblemon_kinetics:pokemon/squirtle',
       1,
       '20000000-0000-4000-8000-000000000013',
-      '{"machine_id":"create:water_wheel"}'::jsonb
+      '{"work":{"machine_id":"not a registry id"}}'::jsonb
     )
   $$,
   'PGRST',
   null,
-  'direct RPC calls cannot substitute an unapproved machine ID'
+  'direct RPC calls cannot save a malformed registry relationship'
 );
 
 select throws_ok(
   $$
     select public.save_record_revision(
-      'cobblemon_kinetics:hydro_operator',
+      'cobblemon_kinetics:pokemon/squirtle/default',
       1,
       '20000000-0000-4000-8000-000000000014',
-      '{"private_note":"not an editable Pokemon record"}'::jsonb
+      '{"private_note":"forms are modeled but not independently editable"}'::jsonb
     )
   $$,
   'PGRST',
   null,
-  'records without an authoritative editor contract reject direct edits'
+  'records without an active Studio editor contract reject direct edits'
 );
 
 select throws_ok(
@@ -343,7 +343,7 @@ select throws_ok(
       'cobblemon_kinetics:pokemon/squirtle',
       null,
       '20000000-0000-4000-8000-000000000015',
-      '{"efficiency":1.1}'::jsonb
+      '{"balance":{"efficiency":1.1}}'::jsonb
     )
   $$,
   '22023',
@@ -357,7 +357,7 @@ select lives_ok(
       'cobblemon_kinetics:pokemon/squirtle',
       1,
       '20000000-0000-4000-8000-000000000002',
-      '{"efficiency":1.25,"public_rationale":"Test-approved Hydro rationale.","private_note":"test-only private note"}'::jsonb
+      '{"balance":{"efficiency":1.25,"public_rationale":"Test-approved Hydro rationale."},"private_note":"test-only private note"}'::jsonb
     )
   $$,
   'an editor can save a revision through the checked RPC'
@@ -389,7 +389,7 @@ select throws_ok(
       'cobblemon_kinetics:pokemon/squirtle',
       1,
       '20000000-0000-4000-8000-000000000003',
-      '{"efficiency":1.5}'::jsonb
+      '{"balance":{"efficiency":1.5}}'::jsonb
     )
   $$,
   'PGRST',
@@ -406,7 +406,7 @@ select throws_ok(
 reset role;
 
 update public.records
-set content = content || '{"efficiency":99}'::jsonb
+set content = jsonb_set(content, '{balance,efficiency}', '99'::jsonb, true)
 where public_id = 'cobblemon_kinetics:pokemon/squirtle';
 
 select set_config('request.jwt.claim.sub', '10000000-0000-4000-8000-000000000003', true);
@@ -434,7 +434,7 @@ where record.id = revision.record_id
 update public.records
 set content = jsonb_set(
   content,
-  '{public_rationale}',
+  '{balance,public_rationale}',
   '"Valid but not revisioned."'::jsonb
 )
 where public_id = 'cobblemon_kinetics:pokemon/squirtle';

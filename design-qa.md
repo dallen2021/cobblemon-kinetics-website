@@ -47,6 +47,10 @@ The navigation refinement matches the requested hierarchy: the project emblem re
 - No generated Pokémon, Poké Ball, Minecraft block, Cobblemon model, Create machine, or add-on machine imagery is shipped.
 - Species and machine records use neutral text treatments until separately sourced assets pass rights and provenance review.
 - Generated borders contain interface geometry only; their prompts, transformations, dimensions, slices, and hashes are recorded in `docs/GENERATED_ART.md` and the public frame manifest.
+- Installed Create and Cobblemon PNGs can be reviewed only through the authenticated loopback Studio route. They remain under ignored `.private`, use no-store delivery, and are never treated as approved production art.
+- The source browser identifies raw UV maps, atlases, and component textures honestly rather than presenting them as finished species portraits or machine icons.
+- Production output tracing excludes the ignored `.private` tree; the local gallery route trace contains zero third-party source files.
+- ZIP entries are size-limited before decompression, streamed with CRC verification, fully PNG-decoded within a pixel cap, and written through canonical non-symlink directories.
 
 ## Result
 

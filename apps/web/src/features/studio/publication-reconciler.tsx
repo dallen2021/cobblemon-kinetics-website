@@ -5,7 +5,7 @@ import { StatusLamp } from "@/components/ui";
 import {
   reconcilePublicationCommit,
   type ReconcilePublicationResult,
-} from "@/server/studio-actions";
+} from "@/server/publication-actions";
 
 export function PublicationReconciler({
   initialPublicationId,
