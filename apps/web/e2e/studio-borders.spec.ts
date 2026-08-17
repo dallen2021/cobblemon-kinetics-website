@@ -16,13 +16,14 @@ const P0_FRAMES = [
   ["private notes", ".private-section"],
   ["inspector cards", ".inspector-block"],
   ["publication gate", ".publication-block"],
-  ["Studio action", ".editor-inspector .button-primary"],
+  ["Studio action", ".publication-block .button-primary"],
 ] as const;
 
 async function openStudio(page: Page): Promise<void> {
   await page.goto(STUDIO_ROUTE);
   await expect(page.getByText("Safe fixture", { exact: true })).toBeAttached();
-  await expect(page.getByRole("heading", { name: "Squirtle" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Squirtle", exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "Discussion & History" }).click();
 }
 
 async function expectNoDocumentOverflow(page: Page): Promise<void> {

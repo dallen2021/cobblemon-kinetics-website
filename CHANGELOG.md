@@ -17,6 +17,12 @@ data toolchain are documented here.
   linked neutral work items, generic record revisions/comments/conflicts, and
   a controlled transactional workbook importer with private provenance and
   flavor-text quarantine.
+- Kinetic Blueprint family editor with six typed node families, Canvas and
+  keyboard/mobile Outline modes, staged atomic Apply, shared layouts, personal
+  views, type suggestions, and explicit evolution inheritance reviews.
+- Controlled Pokémon facts and normalized Gen 1 evolution data covering 78
+  families and 72 explicit edges, including Eevee branching and no invented
+  Hitmon evolution.
 
 ### Changed
 

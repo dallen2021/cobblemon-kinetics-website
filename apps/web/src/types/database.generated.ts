@@ -320,6 +320,321 @@ export type Database = {
           },
         ]
       }
+      blueprint_annotations: {
+        Row: {
+          annotation_kind: string
+          board_record_id: string
+          body: string
+          created_at: string
+          created_by: string | null
+          group_key: string | null
+          height: number
+          id: string
+          position_x: number
+          position_y: number
+          updated_at: string
+          updated_by: string | null
+          width: number
+        }
+        Insert: {
+          annotation_kind: string
+          board_record_id: string
+          body: string
+          created_at?: string
+          created_by?: string | null
+          group_key?: string | null
+          height?: number
+          id?: string
+          position_x: number
+          position_y: number
+          updated_at?: string
+          updated_by?: string | null
+          width?: number
+        }
+        Update: {
+          annotation_kind?: string
+          board_record_id?: string
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          group_key?: string | null
+          height?: number
+          id?: string
+          position_x?: number
+          position_y?: number
+          updated_at?: string
+          updated_by?: string | null
+          width?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprint_annotations_board_record_id_fkey"
+            columns: ["board_record_id"]
+            isOneToOne: false
+            referencedRelation: "blueprint_boards"
+            referencedColumns: ["record_id"]
+          },
+        ]
+      }
+      blueprint_boards: {
+        Row: {
+          board_revision: number
+          created_at: string
+          family_record_id: string
+          layout_checksum: string
+          record_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          board_revision?: number
+          created_at?: string
+          family_record_id: string
+          layout_checksum?: string
+          record_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          board_revision?: number
+          created_at?: string
+          family_record_id?: string
+          layout_checksum?: string
+          record_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprint_boards_family_record_id_fkey"
+            columns: ["family_record_id"]
+            isOneToOne: true
+            referencedRelation: "evolution_families"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "blueprint_boards_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: true
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blueprint_edges: {
+        Row: {
+          board_record_id: string
+          created_at: string
+          label: string
+          relationship_record_id: string
+          sort_order: number
+          source_handle: string
+          target_handle: string
+        }
+        Insert: {
+          board_record_id: string
+          created_at?: string
+          label?: string
+          relationship_record_id: string
+          sort_order?: number
+          source_handle: string
+          target_handle: string
+        }
+        Update: {
+          board_record_id?: string
+          created_at?: string
+          label?: string
+          relationship_record_id?: string
+          sort_order?: number
+          source_handle?: string
+          target_handle?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprint_edges_board_record_id_fkey"
+            columns: ["board_record_id"]
+            isOneToOne: false
+            referencedRelation: "blueprint_boards"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "blueprint_edges_relationship_record_id_fkey"
+            columns: ["relationship_record_id"]
+            isOneToOne: false
+            referencedRelation: "studio_relationships"
+            referencedColumns: ["record_id"]
+          },
+        ]
+      }
+      blueprint_mutations: {
+        Row: {
+          actor_id: string
+          board_record_id: string
+          client_mutation_id: string
+          created_at: string
+          result: Json
+        }
+        Insert: {
+          actor_id: string
+          board_record_id: string
+          client_mutation_id: string
+          created_at?: string
+          result: Json
+        }
+        Update: {
+          actor_id?: string
+          board_record_id?: string
+          client_mutation_id?: string
+          created_at?: string
+          result?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprint_mutations_board_record_id_fkey"
+            columns: ["board_record_id"]
+            isOneToOne: false
+            referencedRelation: "blueprint_boards"
+            referencedColumns: ["record_id"]
+          },
+        ]
+      }
+      blueprint_nodes: {
+        Row: {
+          board_record_id: string
+          collapsed: boolean
+          created_at: string
+          group_key: string | null
+          height: number | null
+          node_family: string
+          position_x: number
+          position_y: number
+          record_id: string
+          updated_at: string
+          width: number | null
+          z_index: number
+        }
+        Insert: {
+          board_record_id: string
+          collapsed?: boolean
+          created_at?: string
+          group_key?: string | null
+          height?: number | null
+          node_family: string
+          position_x?: number
+          position_y?: number
+          record_id: string
+          updated_at?: string
+          width?: number | null
+          z_index?: number
+        }
+        Update: {
+          board_record_id?: string
+          collapsed?: boolean
+          created_at?: string
+          group_key?: string | null
+          height?: number | null
+          node_family?: string
+          position_x?: number
+          position_y?: number
+          record_id?: string
+          updated_at?: string
+          width?: number | null
+          z_index?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprint_nodes_board_record_id_fkey"
+            columns: ["board_record_id"]
+            isOneToOne: false
+            referencedRelation: "blueprint_boards"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "blueprint_nodes_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blueprint_user_preferences: {
+        Row: {
+          auth_user_id: string
+          board_record_id: string
+          filters: Json
+          hidden_record_ids: string[]
+          last_view: string
+          updated_at: string
+          viewport: Json
+        }
+        Insert: {
+          auth_user_id: string
+          board_record_id: string
+          filters?: Json
+          hidden_record_ids?: string[]
+          last_view?: string
+          updated_at?: string
+          viewport?: Json
+        }
+        Update: {
+          auth_user_id?: string
+          board_record_id?: string
+          filters?: Json
+          hidden_record_ids?: string[]
+          last_view?: string
+          updated_at?: string
+          viewport?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blueprint_user_preferences_auth_user_id_fkey"
+            columns: ["auth_user_id"]
+            isOneToOne: false
+            referencedRelation: "app_users"
+            referencedColumns: ["auth_user_id"]
+          },
+          {
+            foreignKeyName: "blueprint_user_preferences_board_record_id_fkey"
+            columns: ["board_record_id"]
+            isOneToOne: false
+            referencedRelation: "blueprint_boards"
+            referencedColumns: ["record_id"]
+          },
+        ]
+      }
+      capabilities: {
+        Row: {
+          category: string
+          created_at: string
+          description: string
+          record_id: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          description?: string
+          record_id: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string
+          record_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "capabilities_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: true
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           author_id: string
@@ -421,6 +736,68 @@ export type Database = {
           },
         ]
       }
+      conditions: {
+        Row: {
+          condition_kind: string
+          created_at: string
+          description: string
+          record_id: string
+          updated_at: string
+        }
+        Insert: {
+          condition_kind: string
+          created_at?: string
+          description?: string
+          record_id: string
+          updated_at?: string
+        }
+        Update: {
+          condition_kind?: string
+          created_at?: string
+          description?: string
+          record_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "conditions_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: true
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      controlled_fact_values: {
+        Row: {
+          created_at: string
+          display_name: string
+          imported: boolean
+          is_active: boolean
+          slug: string
+          sort_order: number
+          vocabulary: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          imported?: boolean
+          is_active?: boolean
+          slug: string
+          sort_order?: number
+          vocabulary: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          imported?: boolean
+          is_active?: boolean
+          slug?: string
+          sort_order?: number
+          vocabulary?: string
+        }
+        Relationships: []
+      }
       editor_allowlist: {
         Row: {
           created_at: string
@@ -456,6 +833,236 @@ export type Database = {
           updated_by?: string | null
         }
         Relationships: []
+      }
+      evolution_edges: {
+        Row: {
+          created_at: string
+          family_record_id: string
+          from_form_record_id: string
+          relationship_record_id: string
+          to_form_record_id: string
+          trigger_summary: string
+        }
+        Insert: {
+          created_at?: string
+          family_record_id: string
+          from_form_record_id: string
+          relationship_record_id: string
+          to_form_record_id: string
+          trigger_summary?: string
+        }
+        Update: {
+          created_at?: string
+          family_record_id?: string
+          from_form_record_id?: string
+          relationship_record_id?: string
+          to_form_record_id?: string
+          trigger_summary?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evolution_edges_family_record_id_fkey"
+            columns: ["family_record_id"]
+            isOneToOne: false
+            referencedRelation: "evolution_families"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "evolution_edges_from_form_record_id_fkey"
+            columns: ["from_form_record_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_forms"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "evolution_edges_relationship_record_id_fkey"
+            columns: ["relationship_record_id"]
+            isOneToOne: true
+            referencedRelation: "studio_relationships"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "evolution_edges_to_form_record_id_fkey"
+            columns: ["to_form_record_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_forms"
+            referencedColumns: ["record_id"]
+          },
+        ]
+      }
+      evolution_families: {
+        Row: {
+          created_at: string
+          family_key: string
+          generation_id: number
+          imported_label: string
+          record_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          family_key: string
+          generation_id: number
+          imported_label: string
+          record_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          family_key?: string
+          generation_id?: number
+          imported_label?: string
+          record_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evolution_families_generation_id_fkey"
+            columns: ["generation_id"]
+            isOneToOne: false
+            referencedRelation: "generations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "evolution_families_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: true
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      evolution_family_members: {
+        Row: {
+          created_at: string
+          family_record_id: string
+          form_record_id: string
+          sort_order: number
+          stage_index: number
+          stage_label: string
+        }
+        Insert: {
+          created_at?: string
+          family_record_id: string
+          form_record_id: string
+          sort_order?: number
+          stage_index: number
+          stage_label: string
+        }
+        Update: {
+          created_at?: string
+          family_record_id?: string
+          form_record_id?: string
+          sort_order?: number
+          stage_index?: number
+          stage_label?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evolution_family_members_family_record_id_fkey"
+            columns: ["family_record_id"]
+            isOneToOne: false
+            referencedRelation: "evolution_families"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "evolution_family_members_form_record_id_fkey"
+            columns: ["form_record_id"]
+            isOneToOne: true
+            referencedRelation: "pokemon_forms"
+            referencedColumns: ["record_id"]
+          },
+        ]
+      }
+      fact_value_reviews: {
+        Row: {
+          created_at: string
+          field_path: string
+          id: string
+          proposed_value: string
+          record_id: string
+          requested_by: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          field_path: string
+          id?: string
+          proposed_value: string
+          record_id: string
+          requested_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          field_path?: string
+          id?: string
+          proposed_value?: string
+          record_id?: string
+          requested_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fact_value_reviews_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: false
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      form_capabilities: {
+        Row: {
+          capability_record_id: string
+          explicit_values: Json
+          form_record_id: string
+          relationship_record_id: string
+          tier: number
+        }
+        Insert: {
+          capability_record_id: string
+          explicit_values?: Json
+          form_record_id: string
+          relationship_record_id: string
+          tier: number
+        }
+        Update: {
+          capability_record_id?: string
+          explicit_values?: Json
+          form_record_id?: string
+          relationship_record_id?: string
+          tier?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_capabilities_capability_record_id_fkey"
+            columns: ["capability_record_id"]
+            isOneToOne: false
+            referencedRelation: "capabilities"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "form_capabilities_form_record_id_fkey"
+            columns: ["form_record_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_forms"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "form_capabilities_relationship_record_id_fkey"
+            columns: ["relationship_record_id"]
+            isOneToOne: true
+            referencedRelation: "studio_relationships"
+            referencedColumns: ["record_id"]
+          },
+        ]
       }
       generations: {
         Row: {
@@ -619,6 +1226,49 @@ export type Database = {
           summary?: Json
         }
         Relationships: []
+      }
+      job_capability_requirements: {
+        Row: {
+          capability_record_id: string
+          job_record_id: string
+          minimum_tier: number
+          relationship_record_id: string
+        }
+        Insert: {
+          capability_record_id: string
+          job_record_id: string
+          minimum_tier: number
+          relationship_record_id: string
+        }
+        Update: {
+          capability_record_id?: string
+          job_record_id?: string
+          minimum_tier?: number
+          relationship_record_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_capability_requirements_capability_record_id_fkey"
+            columns: ["capability_record_id"]
+            isOneToOne: false
+            referencedRelation: "capabilities"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "job_capability_requirements_job_record_id_fkey"
+            columns: ["job_record_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "job_capability_requirements_relationship_record_id_fkey"
+            columns: ["relationship_record_id"]
+            isOneToOne: true
+            referencedRelation: "studio_relationships"
+            referencedColumns: ["record_id"]
+          },
+        ]
       }
       jobs: {
         Row: {
@@ -808,6 +1458,41 @@ export type Database = {
             foreignKeyName: "pokemon_design_ideas_species_record_id_fkey"
             columns: ["species_record_id"]
             isOneToOne: false
+            referencedRelation: "pokemon_species"
+            referencedColumns: ["record_id"]
+          },
+        ]
+      }
+      pokemon_fact_values: {
+        Row: {
+          color_slug: string | null
+          growth_rate_slug: string | null
+          habitat_slug: string | null
+          shape_slug: string | null
+          species_record_id: string
+          updated_at: string
+        }
+        Insert: {
+          color_slug?: string | null
+          growth_rate_slug?: string | null
+          habitat_slug?: string | null
+          shape_slug?: string | null
+          species_record_id: string
+          updated_at?: string
+        }
+        Update: {
+          color_slug?: string | null
+          growth_rate_slug?: string | null
+          habitat_slug?: string | null
+          shape_slug?: string | null
+          species_record_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pokemon_fact_values_species_record_id_fkey"
+            columns: ["species_record_id"]
+            isOneToOne: true
             referencedRelation: "pokemon_species"
             referencedColumns: ["record_id"]
           },
@@ -1421,6 +2106,41 @@ export type Database = {
           },
         ]
       }
+      results: {
+        Row: {
+          bounds: Json
+          created_at: string
+          description: string
+          record_id: string
+          result_kind: string
+          updated_at: string
+        }
+        Insert: {
+          bounds?: Json
+          created_at?: string
+          description?: string
+          record_id: string
+          result_kind: string
+          updated_at?: string
+        }
+        Update: {
+          bounds?: Json
+          created_at?: string
+          description?: string
+          record_id?: string
+          result_kind?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "results_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: true
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       source_references: {
         Row: {
           created_at: string
@@ -1468,6 +2188,175 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "records"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      studio_relationships: {
+        Row: {
+          created_at: string
+          inheritance_decision: string | null
+          inheritance_state: string
+          metadata: Json
+          parent_relationship_record_id: string | null
+          parent_revision_at_review: number | null
+          record_id: string
+          relationship_kind: string
+          source_record_id: string
+          target_record_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          inheritance_decision?: string | null
+          inheritance_state?: string
+          metadata?: Json
+          parent_relationship_record_id?: string | null
+          parent_revision_at_review?: number | null
+          record_id: string
+          relationship_kind: string
+          source_record_id: string
+          target_record_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          inheritance_decision?: string | null
+          inheritance_state?: string
+          metadata?: Json
+          parent_relationship_record_id?: string | null
+          parent_revision_at_review?: number | null
+          record_id?: string
+          relationship_kind?: string
+          source_record_id?: string
+          target_record_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "studio_relationships_parent_relationship_record_id_fkey"
+            columns: ["parent_relationship_record_id"]
+            isOneToOne: false
+            referencedRelation: "studio_relationships"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "studio_relationships_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: true
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "studio_relationships_source_record_id_fkey"
+            columns: ["source_record_id"]
+            isOneToOne: false
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "studio_relationships_target_record_id_fkey"
+            columns: ["target_record_id"]
+            isOneToOne: false
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      type_capability_acceptances: {
+        Row: {
+          accepted_at: string
+          accepted_by: string | null
+          form_record_id: string
+          relationship_record_id: string
+          suggestion_id: string
+        }
+        Insert: {
+          accepted_at?: string
+          accepted_by?: string | null
+          form_record_id: string
+          relationship_record_id: string
+          suggestion_id: string
+        }
+        Update: {
+          accepted_at?: string
+          accepted_by?: string | null
+          form_record_id?: string
+          relationship_record_id?: string
+          suggestion_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "type_capability_acceptances_form_record_id_fkey"
+            columns: ["form_record_id"]
+            isOneToOne: false
+            referencedRelation: "pokemon_forms"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "type_capability_acceptances_relationship_record_id_fkey"
+            columns: ["relationship_record_id"]
+            isOneToOne: true
+            referencedRelation: "studio_relationships"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "type_capability_acceptances_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "type_capability_suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      type_capability_suggestions: {
+        Row: {
+          accepted_relationship_record_id: string | null
+          capability_record_id: string
+          created_at: string
+          id: string
+          rationale: string
+          suggested_tier: number
+          type_workshop_record_id: string
+        }
+        Insert: {
+          accepted_relationship_record_id?: string | null
+          capability_record_id: string
+          created_at?: string
+          id?: string
+          rationale?: string
+          suggested_tier: number
+          type_workshop_record_id: string
+        }
+        Update: {
+          accepted_relationship_record_id?: string | null
+          capability_record_id?: string
+          created_at?: string
+          id?: string
+          rationale?: string
+          suggested_tier?: number
+          type_workshop_record_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "type_capability_suggestions_accepted_relationship_record_i_fkey"
+            columns: ["accepted_relationship_record_id"]
+            isOneToOne: false
+            referencedRelation: "studio_relationships"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "type_capability_suggestions_capability_record_id_fkey"
+            columns: ["capability_record_id"]
+            isOneToOne: false
+            referencedRelation: "capabilities"
+            referencedColumns: ["record_id"]
+          },
+          {
+            foreignKeyName: "type_capability_suggestions_type_workshop_record_id_fkey"
+            columns: ["type_workshop_record_id"]
+            isOneToOne: false
+            referencedRelation: "type_workshop_plans"
+            referencedColumns: ["record_id"]
           },
         ]
       }
@@ -1703,6 +2592,48 @@ export type Database = {
           },
         ]
       }
+      work_targets: {
+        Row: {
+          created_at: string
+          description: string
+          record_id: string
+          registry_entry_record_id: string | null
+          target_kind: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          record_id: string
+          registry_entry_record_id?: string | null
+          target_kind: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          record_id?: string
+          registry_entry_record_id?: string | null
+          target_kind?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "work_targets_record_id_fkey"
+            columns: ["record_id"]
+            isOneToOne: true
+            referencedRelation: "records"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "work_targets_registry_entry_record_id_fkey"
+            columns: ["registry_entry_record_id"]
+            isOneToOne: false
+            referencedRelation: "registry_entries"
+            referencedColumns: ["record_id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -1710,6 +2641,17 @@ export type Database = {
     Functions: {
       add_record_comment: {
         Args: { p_body: string; p_public_id: string }
+        Returns: Json
+      }
+      apply_blueprint_change_set: {
+        Args: {
+          p_board_id: string
+          p_client_mutation_id: string
+          p_expected_board_revision: number
+          p_expected_record_heads: Json
+          p_layout: Json
+          p_operations: Json
+        }
         Returns: Json
       }
       apply_gen1_workbook_import: {
@@ -1729,13 +2671,29 @@ export type Database = {
         Args: { p_expected_revision: number }
         Returns: Json
       }
+      get_blueprint_head: { Args: { p_board_public_id: string }; Returns: Json }
       get_editor_record: { Args: { p_public_id: string }; Returns: Json }
+      get_family_blueprint: {
+        Args: { p_family_public_id: string }
+        Returns: Json
+      }
+      get_pokemon_workspace: { Args: { p_public_id: string }; Returns: Json }
       get_publication_bundle: {
         Args: { p_publication_id: string }
         Returns: Json
       }
       get_record_head: { Args: { p_public_id: string }; Returns: Json }
       list_active_members: { Args: never; Returns: Json }
+      list_blueprint_library: {
+        Args: {
+          p_cursor?: string
+          p_filters?: Json
+          p_kinds?: string[]
+          p_limit?: number
+          p_query?: string
+        }
+        Returns: Json
+      }
       list_editor_records: {
         Args: {
           p_cursor?: string
@@ -1748,6 +2706,11 @@ export type Database = {
         }
         Returns: Json
       }
+      list_studio_relationships: {
+        Args: { p_kinds?: string[]; p_limit?: number; p_query?: string }
+        Returns: Json
+      }
+      reconcile_gen1_evolution_blueprints: { Args: never; Returns: Json }
       reconcile_publication_commit: {
         Args: {
           p_actor_id: string
@@ -1758,6 +2721,15 @@ export type Database = {
         Returns: Json
       }
       resolve_record_comment: { Args: { p_comment_id: string }; Returns: Json }
+      save_blueprint_user_view: {
+        Args: {
+          p_board_id: string
+          p_filters: Json
+          p_hidden_nodes: string[]
+          p_viewport: Json
+        }
+        Returns: Json
+      }
       save_record_revision: {
         Args: {
           p_client_mutation_id: string

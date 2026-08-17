@@ -1,12 +1,16 @@
 import { notFound } from "next/navigation";
-import { StudioRecordWorkspace } from "@/features/studio/pokemon-workspace";
-import { loadStudioRecord } from "@/server/studio-repository";
+import { PokemonEvolutionWorkspace } from "@/features/studio/pokemon-evolution-workspace";
+import {
+  listBlueprintLibrary,
+  loadFamilyBlueprint,
+  loadPokemonWorkspace,
+} from "@/server/studio-repository";
 
 export const dynamic = "force-dynamic";
 
-async function loadPokemonWorkspace(id: string) {
+async function loadWorkspace(id: string) {
   try {
-    return await loadStudioRecord(id);
+    return await loadPokemonWorkspace(id);
   } catch {
     notFound();
   }
@@ -14,7 +18,17 @@ async function loadPokemonWorkspace(id: string) {
 
 export default async function StudioPokemonPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const record = await loadPokemonWorkspace(id);
-  if (record.recordKind !== "pokemon_species") notFound();
-  return <StudioRecordWorkspace initialRecord={record} />;
+  const workspace = await loadWorkspace(id);
+  const [blueprint, library] = await Promise.all([
+    loadFamilyBlueprint(workspace.family.publicId),
+    listBlueprintLibrary(),
+  ]);
+
+  return (
+    <PokemonEvolutionWorkspace
+      initialWorkspace={workspace}
+      initialBlueprint={blueprint}
+      library={library}
+    />
+  );
 }

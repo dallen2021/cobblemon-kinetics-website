@@ -141,6 +141,15 @@ async function readJson(file: string): Promise<JsonValue> {
   return JSON.parse(await fs.readFile(file, "utf8")) as JsonValue;
 }
 
+async function readOptionalJson(file: string): Promise<JsonValue | undefined> {
+  try {
+    return await readJson(file);
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
+    throw error;
+  }
+}
+
 async function readDirectory(directory: string): Promise<JsonValue[]> {
   const names = (await fs.readdir(directory))
     .filter((name) => name.endsWith(".json"))
@@ -167,12 +176,17 @@ export async function createLocalPublicationBundle(
   const pokemon = pokemonCollection.pokemon;
   if (!Array.isArray(pokemon))
     throw new Error("Published Gen 1 data does not contain a Pokémon collection.");
-  const [jobs, machines, workProfiles, assetManifest] = await Promise.all([
+  const [jobs, machines, workProfiles, blueprintCollection, assetManifest] = await Promise.all([
     readDirectory(path.join(root, "jobs")),
     readDirectory(path.join(root, "machines")),
     readDirectory(path.join(root, "work_profiles")),
+    readOptionalJson(path.join(root, "blueprints", "records.json")),
     readJson(path.join(root, "assets", "manifest.json")),
   ]);
+  const blueprints = blueprintCollection ? asObject(blueprintCollection).records : undefined;
+  if (blueprints !== undefined && !Array.isArray(blueprints)) {
+    throw new Error("Published Blueprint data does not contain a records collection.");
+  }
   const payload: PublicationBundlePayload = {
     bundle_version: 1,
     schema_version: "1.0.0",
@@ -183,6 +197,13 @@ export async function createLocalPublicationBundle(
       machines: machines as unknown as PublicationBundlePayload["records"]["machines"],
       work_profiles:
         workProfiles as unknown as PublicationBundlePayload["records"]["work_profiles"],
+      ...(blueprints
+        ? {
+            blueprints: blueprints as unknown as NonNullable<
+              PublicationBundlePayload["records"]["blueprints"]
+            >,
+          }
+        : {}),
     },
     asset_manifest: assetManifest as unknown as AssetManifest,
   };

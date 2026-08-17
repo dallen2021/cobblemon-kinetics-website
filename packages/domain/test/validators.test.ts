@@ -3,9 +3,12 @@ import { describe, expect, it } from "vitest";
 import {
   assertPublicSafe,
   isResourceLocation,
+  validateKineticBlueprint,
   validateModExportManifest,
+  validatePublicBlueprintRecord,
   validateWorkProfile,
   type ModExportManifest,
+  type PublicBlueprintRecord,
   type WorkProfile,
 } from "../src/index.js";
 
@@ -95,5 +98,68 @@ describe("domain validation", () => {
     expect(() => assertPublicSafe({ public_id: "test:record", private_note: "no" })).toThrow(
       /private or quarantined fields/,
     );
+  });
+
+  it("validates staged Kinetic Blueprint operations and per-form suggestion acceptance", () => {
+    const blueprint = {
+      board: {
+        public_id: "cobblemon_kinetics:blueprint/bulbasaur",
+        family_public_id: "cobblemon_kinetics:evolution-family/bulbasaur",
+        revision: 1,
+        checksum: "a".repeat(64),
+      },
+      nodes: [],
+      edges: [],
+      annotations: [],
+      preference: {
+        viewport: { x: 0, y: 0, zoom: 1 },
+        filters: {},
+        hidden_nodes: [],
+        last_view: "overview",
+      },
+      operations: [
+        {
+          type: "accept_type_suggestion",
+          suggestion_id: "00000000-0000-4000-8000-000000000001",
+          form_public_id: "cobblemon_kinetics:pokemon/bulbasaur/default",
+          tier: 1,
+        },
+      ],
+    };
+
+    expect(validateKineticBlueprint(blueprint)).toMatchObject({ ok: true, errors: [] });
+    expect(
+      validateKineticBlueprint({
+        ...blueprint,
+        operations: [{ ...blueprint.operations[0], tier: 5 }],
+      }).ok,
+    ).toBe(false);
+    expect(
+      validateKineticBlueprint({
+        ...blueprint,
+        operations: [{ type: "accept_type_suggestion", suggestion_id: "not-a-uuid" }],
+      }).ok,
+    ).toBe(false);
+  });
+
+  it("validates strict public Blueprint relationship projections", () => {
+    const relationship: PublicBlueprintRecord = {
+      format_version: 1,
+      public_id: "cobblemon_kinetics:relationship/bulbasaur-plant-care",
+      record_kind: "relationship",
+      name: "Bulbasaur has Plant Care",
+      status: "approved",
+      source_public_id: "cobblemon_kinetics:pokemon/bulbasaur/default",
+      target_public_id: "cobblemon_kinetics:capability/plant-care",
+      relationship_kind: "has_capability",
+      metadata: { tier: 1, radius: 2 },
+      inheritance_decision: "add",
+      parent_relationship_public_id: null,
+    };
+    expect(validatePublicBlueprintRecord(relationship)).toMatchObject({ ok: true, errors: [] });
+    expect(
+      validatePublicBlueprintRecord({ ...relationship, relationship_kind: "invented" }).ok,
+    ).toBe(false);
+    expect(validatePublicBlueprintRecord({ ...relationship, private_note: "leak" }).ok).toBe(false);
   });
 });

@@ -7,9 +7,7 @@ async function currentRevision(page: Page): Promise<number> {
   return Number(revision);
 }
 
-test("searches all 151 records and carries an explicit relationship into the compatibility matrix", async ({
-  page,
-}) => {
+test("searches all 151 records and edits a non-Squirtle Pokémon workspace", async ({ page }) => {
   const editMarker = `e2e-${Date.now()}-${test.info().parallelIndex}`;
   await page.goto("/studio/pokemon");
   await expect(page.getByRole("heading", { name: "Pokémon directory" })).toBeVisible();
@@ -27,21 +25,57 @@ test("searches all 151 records and carries an explicit relationship into the com
   await page.getByRole("button", { name: "Clear" }).click();
   await page.getByLabel("Search Pokémon directory").fill("Pikachu");
   await pikachu.click();
-  await expect(page.getByRole("heading", { name: "Pikachu" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Pikachu", exact: true })).toBeVisible();
   const pikachuRevision = await currentRevision(page);
 
+  await expect(page.getByRole("tab", { name: "Overview" })).toHaveAttribute(
+    "aria-selected",
+    "true",
+  );
+  await expect(page.getByRole("tab", { name: "Blueprint" })).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Facts" })).toBeVisible();
+  await expect(page.getByRole("tab", { name: "Discussion & History" })).toBeVisible();
+
   await page.getByLabel("Candidate job").fill(`Electrical control operator ${editMarker}`);
-  await page.getByLabel("Machine registry ID").fill("cobblemon_kinetics:hydro_coupler");
-  await page.getByLabel("Job public ID").fill("cobblemon_kinetics:hydro_operator");
   await expect(
     page.locator(".revision-list").getByText(`r${pikachuRevision + 1}`, { exact: true }),
   ).toBeVisible({ timeout: 5_000 });
 
-  await page.goto("/studio/compatibility");
-  await page.getByLabel("Search compatibility records").fill("Pikachu");
-  const row = page.locator(".compatibility-table tbody tr").filter({ hasText: "Pikachu" });
-  await expect(row).toContainText("cobblemon_kinetics:hydro_operator");
-  await expect(row).toContainText("cobblemon_kinetics:hydro_coupler");
+  await page.getByRole("tab", { name: "Facts" }).click();
+  await page.getByLabel("Body shape").selectOption("upright");
+  await expect(page.getByText(/Revision \d+ saved/u)).toBeVisible({ timeout: 5_000 });
+  await expect(page.getByText(/Original:/u).first()).toBeVisible();
+});
+
+test("uses one staged change set in Canvas and Outline and explicitly accepts a type suggestion", async ({
+  page,
+}) => {
+  await page.goto("/studio/pokemon/oddish");
+  await expect(page.getByRole("heading", { name: "Oddish", exact: true })).toBeVisible();
+  await page.getByRole("tab", { name: "Blueprint" }).click();
+  await expect(page.getByRole("heading", { name: "Kinetic Blueprint" })).toBeVisible();
+  await expect(page.getByText("Ghosted Type Workshop suggestions")).toBeVisible();
+  await page.getByRole("button", { name: "Accept for this form" }).click();
+  await expect(page.getByText(/accepted locally/u)).toBeVisible();
+
+  await page.getByRole("button", { name: "Outline" }).click();
+  await expect(page.getByLabel("Accessible Blueprint outline")).toContainText("Type suggestion");
+  await page.getByRole("button", { name: "Apply Changes" }).click();
+  await expect(page.getByText(/saved atomically/u)).toBeVisible({ timeout: 5_000 });
+
+  const acceptedRelationship = page
+    .locator(".blueprint-outline ol button")
+    .filter({ hasText: "Type suggestion" })
+    .first();
+  await acceptedRelationship.click();
+  await page.getByRole("button", { name: "Approve exact revision" }).click();
+  await expect(page.getByText(/Approved cobblemon_kinetics:relationship/u)).toBeVisible();
+
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "Oddish", exact: true })).toBeVisible();
+  await expect(
+    page.locator(".overview-metrics article").filter({ hasText: "Explicit capabilities" }),
+  ).toContainText("1");
 });
 
 test("uses type directions and preserves explicit shared task handoffs", async ({ page }) => {
@@ -68,6 +102,16 @@ test("uses type directions and preserves explicit shared task handoffs", async (
   await expect(card.getByLabel(/Fixture Jake/u)).toBeChecked();
 });
 
+test("derives compatibility from the same Blueprint relationships", async ({ page }) => {
+  await page.goto("/studio/compatibility");
+  await expect(page.getByRole("heading", { name: "Compatibility matrix" })).toBeVisible();
+  await page.getByPlaceholder("Search Dex, name, or ID").fill("Bulbasaur");
+  const row = page.locator(".compatibility-table tbody tr").filter({ hasText: "Bulbasaur" });
+  await expect(row).toContainText("Plant Tender");
+  await expect(row).toContainText("Ordinary Farmland");
+  await expect(row).not.toContainText("Legacy field");
+});
+
 test("shows a real stale-write conflict between two Studio views", async ({ page, context }) => {
   const editMarker = `e2e-${Date.now()}-${test.info().parallelIndex}`;
   const second = await context.newPage();
@@ -81,7 +125,7 @@ test("shows a real stale-write conflict between two Studio views", async ({ page
     ).toBeVisible({ timeout: 5_000 });
 
     await second.getByLabel("Candidate job").fill(`Second maintainer direction ${editMarker}`);
-    await expect(second.getByText(/Another maintainer saved this record/u)).toBeVisible({
+    await expect(second.getByText(/Another maintainer saved revision/u)).toBeVisible({
       timeout: 5_000,
     });
     await expect(second.getByRole("heading", { name: "Remote revision" })).toBeVisible();

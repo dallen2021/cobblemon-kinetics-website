@@ -4,6 +4,8 @@ import {
   fixtureRecordDetail,
   fixtureGen1Records,
   fixtureRecordList,
+  fixtureFamilyBlueprint,
+  fixturePokemonWorkspace,
   fixturePlanningRecords,
   fixtureTypes,
   resetFixtureStudioState,
@@ -116,5 +118,32 @@ describe("Gen 1 Studio fixture", () => {
       status: "in_progress",
       handoffNote: "Daniel drafts the job; Jake checks the machine relationship.",
     });
+  });
+
+  it("builds the complete Bulbasaur Blueprint without inheriting species facts", () => {
+    const bulbasaur = fixturePokemonWorkspace("bulbasaur");
+    const ivysaur = fixturePokemonWorkspace("ivysaur");
+    const venusaur = fixturePokemonWorkspace("venusaur");
+    const blueprint = fixtureFamilyBlueprint("cobblemon_kinetics:evolution-family/bulbasaur");
+
+    expect(blueprint?.nodes).toHaveLength(8);
+    expect(blueprint?.edges).toHaveLength(12);
+    expect(blueprint?.edges.filter((edge) => edge.relationshipKind === "evolves_to")).toHaveLength(
+      2,
+    );
+    expect([bulbasaur, ivysaur, venusaur].map((record) => record?.capabilities[0]?.tier)).toEqual([
+      1, 2, 3,
+    ]);
+    const ivysaurFacts = structuredClone(ivysaur?.facts);
+    saveFixtureStudioRecord(bulbasaur!.publicId, bulbasaur!.revision, {
+      facts: { ...bulbasaur!.facts, genus: "Reviewed Bulbasaur-only genus" },
+      design: bulbasaur!.design,
+      work: bulbasaur!.work,
+      balance: bulbasaur!.balance,
+      testing: bulbasaur!.testing,
+      planning: bulbasaur!.planning,
+      privateNote: bulbasaur!.privateNote,
+    });
+    expect(fixturePokemonWorkspace("ivysaur")?.facts).toEqual(ivysaurFacts);
   });
 });

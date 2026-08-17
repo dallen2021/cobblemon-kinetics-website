@@ -3,11 +3,17 @@
 import { headers } from "next/headers";
 import {
   addFixtureStudioComment,
+  approveFixtureBlueprintRecord,
   approveFixtureStudioRecord,
+  fixtureFamilyBlueprint,
+  saveFixtureFamilyBlueprint,
   saveFixtureStudioRecord,
   setFixtureWorkItemAssignments,
 } from "@/data/gen1-fixture";
 import type {
+  BlueprintConflictEntity,
+  BlueprintOperation,
+  FamilyBlueprint,
   StudioComment,
   StudioHead,
   StudioObject,
@@ -23,6 +29,8 @@ import {
   listStudioMembers,
   loadStudioRecord,
   loadStudioRecordHead,
+  loadBlueprintHead,
+  normalizeBlueprint,
   normalizeStudioRecord,
 } from "./studio-repository";
 import { createSignedPublicationBundleFromRpc, publicationIdFromRpc } from "./publication-bundle";
@@ -46,6 +54,10 @@ export type StudioSaveResult =
 
 export type StudioPublicationResult =
   | { ok: true; publicationId: string }
+  | { ok: false; kind: "validation" | "conflict" | "error"; message: string };
+
+export type BlueprintApprovalResult =
+  | { ok: true; publicId: string; revision: number; workflowState: "approved" }
   | { ok: false; kind: "validation" | "conflict" | "error"; message: string };
 
 function validPublicId(value: string): boolean {
@@ -164,6 +176,61 @@ export async function approveStudioRecord(
   return { ok: true, record: normalizeStudioRecord(envelope.record ?? data) };
 }
 
+export async function approveBlueprintRecord(
+  publicId: string,
+  expectedRevision: number,
+): Promise<BlueprintApprovalResult> {
+  await assertSameOrigin();
+  await requireMaintainer("/studio");
+  if (!validPublicId(publicId) || !Number.isSafeInteger(expectedRevision) || expectedRevision < 1) {
+    return {
+      ok: false,
+      kind: "validation",
+      message: "The Blueprint record or revision is invalid.",
+    };
+  }
+  if (isFixtureModeEnabled()) {
+    const record = approveFixtureBlueprintRecord(publicId, expectedRevision);
+    return record
+      ? { ok: true, ...record }
+      : {
+          ok: false,
+          kind: "conflict",
+          message: "The fixture record changed or its draft stub still needs completion.",
+        };
+  }
+  if (!hasSupabaseEnvironment()) {
+    return { ok: false, kind: "error", message: "Supabase is not configured." };
+  }
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.rpc("approve_record_revision", {
+    p_public_id: publicId,
+    p_expected_revision: expectedRevision,
+  });
+  if (error) {
+    const diagnostic = `${error.code} ${error.message}`.toLowerCase();
+    if (/revision_conflict|integrity/u.test(diagnostic)) {
+      return {
+        ok: false,
+        kind: "conflict",
+        message: "This Blueprint record changed. Refresh the family before approving it.",
+      };
+    }
+    return {
+      ok: false,
+      kind: "validation",
+      message: "Complete and validate this Blueprint record before approval.",
+    };
+  }
+  const record = normalizeStudioRecord((data as { record?: unknown }).record ?? data);
+  return {
+    ok: true,
+    publicId: record.publicId,
+    revision: record.revision,
+    workflowState: "approved",
+  };
+}
+
 export async function checkStudioRecordHead(publicId: string): Promise<StudioHead> {
   await requireEditor("/studio");
   if (!validPublicId(publicId)) throw new Error("The selected Studio record has an invalid ID.");
@@ -259,6 +326,374 @@ export async function setStudioWorkItemAssignments(input: {
     throw new Error("The work-item assignment could not be saved.");
   const rows = (data as { work_items?: unknown }).work_items;
   return Array.isArray(rows) ? (rows as StudioWorkItemLink[]) : [];
+}
+
+export interface BlueprintApplyInput {
+  boardPublicId: string;
+  familyPublicId: string;
+  expectedBoardRevision: number;
+  expectedRecordHeads: Record<string, number>;
+  operations: BlueprintOperation[];
+  layout: {
+    nodes: Array<{
+      record_public_id: string;
+      position: { x: number; y: number };
+      group_key?: string | null;
+      collapsed?: boolean;
+    }>;
+  };
+  clientMutationId: string;
+}
+
+export type BlueprintApplyResult =
+  | { ok: true; blueprint: FamilyBlueprint }
+  | { ok: false; kind: "validation" | "error"; message: string }
+  | {
+      ok: false;
+      kind: "conflict";
+      message: string;
+      staleEntities: BlueprintConflictEntity[];
+      currentBoardRevision?: number;
+    };
+
+function validateBlueprintInput(input: BlueprintApplyInput): string | null {
+  if (!validPublicId(input.boardPublicId) || !validPublicId(input.familyPublicId)) {
+    return "The selected family Blueprint has an invalid ID.";
+  }
+  if (!Number.isSafeInteger(input.expectedBoardRevision) || input.expectedBoardRevision < 1) {
+    return "The shared board revision is invalid.";
+  }
+  if (!isCanonicalUuid(input.clientMutationId)) return "The Blueprint request ID is invalid.";
+  if (input.operations.length > 200 || JSON.stringify(input.operations).length > 1_000_000) {
+    return "A Blueprint Apply may contain at most 200 bounded operations.";
+  }
+  if (
+    Object.entries(input.expectedRecordHeads).some(
+      ([publicId, revision]) =>
+        !validPublicId(publicId) || !Number.isSafeInteger(revision) || revision < 0,
+    )
+  ) {
+    return "One or more expected Blueprint record revisions are invalid.";
+  }
+  if (
+    input.layout.nodes.some(
+      (node) =>
+        !validPublicId(node.record_public_id) ||
+        !Number.isFinite(node.position.x) ||
+        !Number.isFinite(node.position.y) ||
+        Math.abs(node.position.x) > 100_000 ||
+        Math.abs(node.position.y) > 100_000,
+    )
+  ) {
+    return "The shared Blueprint layout contains an invalid node position.";
+  }
+  return null;
+}
+
+function applyFixtureOperations(
+  blueprint: FamilyBlueprint,
+  input: BlueprintApplyInput,
+): FamilyBlueprint {
+  const next = structuredClone(blueprint);
+  const fixtureLibrary = fixtureFamilyBlueprint(
+    "cobblemon_kinetics:evolution-family/bulbasaur",
+  )?.nodes;
+  for (const operation of input.operations) {
+    if (operation.type === "remove_node") {
+      next.nodes = next.nodes.filter((node) => node.id !== operation.record_public_id);
+    } else if (operation.type === "add_node" || operation.type === "move_node") {
+      const node = next.nodes.find((candidate) => candidate.id === operation.record_public_id);
+      if (node) node.position = operation.position;
+      else if (operation.type === "add_node") {
+        const source = fixtureLibrary?.find(
+          (candidate) => candidate.id === operation.record_public_id,
+        );
+        if (source) next.nodes.push({ ...structuredClone(source), position: operation.position });
+      }
+    } else if (operation.type === "create_stub") {
+      const nodeFamily =
+        operation.record_kind === "work_target"
+          ? "worksite"
+          : operation.record_kind === "condition"
+            ? "interlock"
+            : operation.record_kind;
+      next.nodes.push({
+        id: operation.record_public_id,
+        recordKind: operation.record_kind,
+        nodeFamily,
+        displayName: operation.display_name,
+        workflowState: "draft",
+        recordRevision: 1,
+        position: operation.position,
+        width: 220,
+        height: 116,
+        groupKey: null,
+        collapsed: false,
+        nationalDex: null,
+        types: [],
+        data: {
+          draft_stub: true,
+          needs_completion: !operation.description?.trim(),
+          description: operation.description?.trim() ?? "",
+        },
+      });
+    } else if (operation.type === "remove_edge") {
+      next.edges = next.edges.filter((edge) => edge.id !== operation.relationship_public_id);
+    } else if (operation.type === "archive_relationship") {
+      next.edges = next.edges.filter((edge) => edge.id !== operation.relationship_public_id);
+    } else if (operation.type === "set_inheritance_decision") {
+      const edge = next.edges.find(
+        (candidate) => candidate.id === operation.relationship_public_id,
+      );
+      if (edge) {
+        edge.inheritanceDecision = operation.decision;
+        edge.inheritanceState = "current";
+        edge.metadata = { ...edge.metadata, ...operation.metadata };
+        edge.recordRevision += 1;
+        edge.workflowState = "draft";
+      }
+    } else if (operation.type === "upsert_relationship") {
+      const existing = next.edges.find(
+        (edge) =>
+          edge.source === operation.source_public_id &&
+          edge.target === operation.target_public_id &&
+          edge.relationshipKind === operation.relationship_kind,
+      );
+      if (existing) {
+        existing.metadata = operation.metadata;
+        existing.inheritanceDecision = operation.inheritance_decision ?? null;
+        existing.inheritanceState = operation.inheritance_decision ? "current" : "not_applicable";
+        existing.recordRevision += 1;
+        existing.workflowState = "draft";
+      } else {
+        const handles: Record<string, [string, string]> = {
+          has_capability: ["worker:capability", "capability:worker"],
+          requires_capability: ["job:requirement", "capability:job"],
+          assigned_to_job: ["worker:job", "job:worker"],
+          operates_at: ["job:worksite", "worksite:job"],
+          constrained_by: ["rule:condition", "interlock:rule"],
+          produces_result: ["job:result", "result:job"],
+          evolves_to: ["worker:evolution", "worker:evolution"],
+        };
+        const [sourceHandle, targetHandle] = handles[operation.relationship_kind]!;
+        next.edges.push({
+          id: `cobblemon_kinetics:relationship/fixture-${crypto.randomUUID()}`,
+          relationshipKind: operation.relationship_kind,
+          source: operation.source_public_id,
+          target: operation.target_public_id,
+          sourceHandle,
+          targetHandle,
+          label: operation.relationship_kind.replaceAll("_", " "),
+          metadata: operation.metadata,
+          inheritanceDecision: operation.inheritance_decision ?? null,
+          inheritanceState: operation.inheritance_decision ? "current" : "not_applicable",
+          workflowState: "draft",
+          recordRevision: 1,
+        });
+      }
+    } else if (operation.type === "add_annotation") {
+      next.annotations.push({
+        id: crypto.randomUUID(),
+        annotationKind: operation.annotation_kind,
+        body: operation.body,
+        positionX: operation.position.x,
+        positionY: operation.position.y,
+        width: operation.width ?? 280,
+        height: operation.height ?? 140,
+        groupKey: operation.group_key ?? null,
+      });
+    } else if (operation.type === "remove_annotation") {
+      next.annotations = next.annotations.filter(
+        (annotation) => annotation.id !== operation.annotation_id,
+      );
+    } else if (operation.type === "update_annotation") {
+      const annotation = next.annotations.find(
+        (candidate) => candidate.id === operation.annotation_id,
+      );
+      if (annotation) {
+        if (operation.body !== undefined) annotation.body = operation.body;
+        if (operation.position) {
+          annotation.positionX = operation.position.x;
+          annotation.positionY = operation.position.y;
+        }
+      }
+    } else if (operation.type === "accept_type_suggestion") {
+      const capabilityId = "cobblemon_kinetics:capability/plant-care";
+      if (!next.nodes.some((node) => node.id === capabilityId)) {
+        const source = fixtureLibrary?.find((node) => node.id === capabilityId);
+        if (source) {
+          next.nodes.push({
+            ...structuredClone(source),
+            position: operation.position ?? { x: 400, y: 360 },
+          });
+        }
+      }
+      if (
+        !next.edges.some(
+          (edge) =>
+            edge.source === operation.form_public_id &&
+            edge.target === capabilityId &&
+            edge.relationshipKind === "has_capability",
+        )
+      ) {
+        next.edges.push({
+          id: `cobblemon_kinetics:relationship/fixture-${crypto.randomUUID()}`,
+          relationshipKind: "has_capability",
+          source: operation.form_public_id,
+          target: capabilityId,
+          sourceHandle: "worker:capability",
+          targetHandle: "capability:worker",
+          label: `Type suggestion · Tier ${operation.tier ?? 1}`,
+          metadata: { tier: operation.tier ?? 1 },
+          inheritanceDecision: "add",
+          inheritanceState: "current",
+          workflowState: "draft",
+          recordRevision: 1,
+        });
+      }
+    }
+  }
+  for (const layoutNode of input.layout.nodes) {
+    const node = next.nodes.find((candidate) => candidate.id === layoutNode.record_public_id);
+    if (!node) continue;
+    node.position = layoutNode.position;
+    node.groupKey = layoutNode.group_key ?? node.groupKey;
+    node.collapsed = layoutNode.collapsed ?? node.collapsed;
+  }
+  return saveFixtureFamilyBlueprint(next);
+}
+
+export async function applyBlueprintChanges(
+  input: BlueprintApplyInput,
+): Promise<BlueprintApplyResult> {
+  await assertSameOrigin();
+  await requireEditor("/studio");
+  const validation = validateBlueprintInput(input);
+  if (validation) return { ok: false, kind: "validation", message: validation };
+  if (isFixtureModeEnabled()) {
+    const current = fixtureFamilyBlueprint(input.familyPublicId);
+    if (!current) return { ok: false, kind: "error", message: "Fixture Blueprint not found." };
+    const fixtureLibrary = fixtureFamilyBlueprint("cobblemon_kinetics:evolution-family/bulbasaur");
+    const staleEntities = Object.entries(input.expectedRecordHeads)
+      .filter(([publicId, revision]) => {
+        const node =
+          current.nodes.find((candidate) => candidate.id === publicId) ??
+          fixtureLibrary?.nodes.find((candidate) => candidate.id === publicId);
+        const edge = current.edges.find((candidate) => candidate.id === publicId);
+        return (node?.recordRevision ?? edge?.recordRevision ?? -1) !== revision;
+      })
+      .map(([publicId, expectedRevision]) => ({
+        publicId,
+        expectedRevision,
+        currentRevision:
+          current.nodes.find((candidate) => candidate.id === publicId)?.recordRevision ??
+          fixtureLibrary?.nodes.find((candidate) => candidate.id === publicId)?.recordRevision ??
+          current.edges.find((candidate) => candidate.id === publicId)?.recordRevision ??
+          null,
+      }));
+    if (current.board.revision !== input.expectedBoardRevision || staleEntities.length) {
+      return {
+        ok: false,
+        kind: "conflict",
+        message: "The fixture board or one of its records changed.",
+        staleEntities,
+        currentBoardRevision: current.board.revision,
+      };
+    }
+    return { ok: true, blueprint: applyFixtureOperations(current, input) };
+  }
+  if (!hasSupabaseEnvironment()) {
+    return { ok: false, kind: "error", message: "Supabase is not configured." };
+  }
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.rpc("apply_blueprint_change_set", {
+    p_board_id: input.boardPublicId,
+    p_expected_board_revision: input.expectedBoardRevision,
+    p_expected_record_heads: input.expectedRecordHeads,
+    p_operations: input.operations,
+    p_layout: input.layout,
+    p_client_mutation_id: input.clientMutationId,
+  });
+  if (error) {
+    const diagnostic = `${error.code} ${error.message}`;
+    if (diagnostic.includes("blueprint_conflict")) {
+      let payload: Record<string, unknown> = {};
+      try {
+        const start = error.message.indexOf("{");
+        if (start >= 0) payload = JSON.parse(error.message.slice(start)) as Record<string, unknown>;
+      } catch {
+        payload = {};
+      }
+      const staleEntities = Array.isArray(payload.stale_entities)
+        ? payload.stale_entities.map((candidate) => {
+            const row = candidate as Record<string, unknown>;
+            return {
+              publicId: String(row.public_id ?? input.boardPublicId),
+              expectedRevision: Number(row.expected_revision ?? input.expectedBoardRevision),
+              currentRevision:
+                row.current_revision === null || row.current_revision === undefined
+                  ? null
+                  : Number(row.current_revision),
+            };
+          })
+        : [];
+      return {
+        ok: false,
+        kind: "conflict",
+        message: "Another maintainer changed the board. Review the stale records before applying.",
+        staleEntities,
+        currentBoardRevision:
+          payload.current_board_revision === undefined
+            ? undefined
+            : Number(payload.current_board_revision),
+      };
+    }
+    return {
+      ok: false,
+      kind: "error",
+      message: "The Blueprint change set was rejected atomically; no partial changes were saved.",
+    };
+  }
+  try {
+    return { ok: true, blueprint: normalizeBlueprint(data) };
+  } catch {
+    return { ok: false, kind: "error", message: "The saved Blueprint response was invalid." };
+  }
+}
+
+export async function checkBlueprintHead(boardPublicId: string) {
+  await requireEditor("/studio");
+  if (!validPublicId(boardPublicId)) throw new Error("The Blueprint ID is invalid.");
+  return loadBlueprintHead(boardPublicId);
+}
+
+export async function saveBlueprintView(input: {
+  boardPublicId: string;
+  viewport: { x: number; y: number; zoom: number };
+  filters: StudioObject & { last_view?: string };
+  hiddenNodes: string[];
+}): Promise<void> {
+  await assertSameOrigin();
+  await requireEditor("/studio");
+  if (
+    !validPublicId(input.boardPublicId) ||
+    !Number.isFinite(input.viewport.x) ||
+    !Number.isFinite(input.viewport.y) ||
+    input.viewport.zoom < 0.1 ||
+    input.viewport.zoom > 4 ||
+    input.hiddenNodes.some((id) => !validPublicId(id))
+  ) {
+    throw new Error("The personal Blueprint view is invalid.");
+  }
+  if (isFixtureModeEnabled()) return;
+  const supabase = await createServerSupabaseClient();
+  const { error } = await supabase.rpc("save_blueprint_user_view", {
+    p_board_id: input.boardPublicId,
+    p_viewport: input.viewport,
+    p_filters: input.filters,
+    p_hidden_nodes: input.hiddenNodes,
+  });
+  if (error) throw new Error("The personal Blueprint view could not be saved.");
 }
 
 /**

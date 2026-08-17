@@ -27,6 +27,10 @@ production-grade content service, and its wiki is not public yet.
   records, neutral design tasks, autosave, immutable revisions, 20-second
   stale-record checks, comments, approval, publication bundles, and Git
   reconciliation.
+- Evolution-aware Pokémon workspaces with controlled fact selectors, 78
+  normalized families, explicit evolution edges, and a shared Kinetic Blueprint
+  canvas/outline editor for capabilities, jobs, worksites, interlocks, and
+  bounded results.
 - SQL migrations, deny-by-default RLS, Storage policies, pgTAP tests, and
   generated database types.
 - JSON Schema contracts and deterministic public-data tooling.
@@ -154,6 +158,22 @@ Task ownership is neutral by default. Author, suggester, importer, and editor
 are not assignees. Assign Daniel, Jake, or another contributor only after an
 explicit decision. Shared ownership uses separate assignee records and a short
 division or handoff note.
+
+## Kinetic Blueprint workflow
+
+Every Pokémon workspace opens on a compact Overview and keeps Facts, Blueprint,
+and Discussion & History separate. The Blueprint is a visual editor over the
+same immutable records used by directories and publication; it is never a
+second data store. Canvas and Outline stage the same typed change set, and Apply
+validates record heads and saves relationships plus shared layout atomically.
+
+Evolution never copies facts or silently scales work. Descendants review each
+inherited capability or job as Keep, Raise, Lower, Replace, Remove, or Add.
+Parent edits mark descendant decisions outdated without rewriting them. Type
+Workshop directions remain suggestions until a maintainer explicitly accepts
+one for a specific form. Compatibility derives job/worksite rows from these
+durable relationships, while personal zoom and filters remain private to each
+maintainer.
 
 ### Applying a reviewed Gen 1 workbook locally
 
